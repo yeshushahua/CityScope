@@ -1,0 +1,39 @@
+services:
+  postgres:
+    build:
+      context: ./database
+    image: cityscope/postgis-pgrouting:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cityscope}
+      POSTGRES_USER: ${POSTGRES_USER:-cityscope}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set a password}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:${BACKEND_PORT:-8000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-8000}
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend
+volumes:
+  postgres_data:

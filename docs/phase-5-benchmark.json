@@ -1,0 +1,621 @@
+{
+  "mapping": {
+    "count": 106,
+    "sha256": "6c3e3d35c64c518c0ea159e2416e82fe17f961e5b019eedcd58a080ee24cd949",
+    "categories": [
+      {
+        "category": "emergency",
+        "facility_count": 4,
+        "mapped_count": 4,
+        "unmapped_count": 0,
+        "average_snap_m": 120.67,
+        "max_snap_m": 149.27
+      },
+      {
+        "category": "healthcare",
+        "facility_count": 102,
+        "mapped_count": 102,
+        "unmapped_count": 0,
+        "average_snap_m": 99.44,
+        "max_snap_m": 429.32
+      }
+    ]
+  },
+  "one_way": {
+    "id": 13266,
+    "osm_id": "420345709",
+    "name": "南滨河东路",
+    "highway": "trunk",
+    "source": 6528742291,
+    "target": 6528742285,
+    "length_m": 2.652494185426234,
+    "cost": 0.15914965112557403,
+    "forward_uses_edge": true,
+    "reverse_uses_edge": false,
+    "reverse_route_edges": 3,
+    "reverse_route_distance_m": 25.6,
+    "reverse_route_time_s": 2.5
+  },
+  "examples": [
+    {
+      "start": [
+        103.8343,
+        36.0611
+      ],
+      "end": [
+        103.85,
+        36.07
+      ],
+      "start_snap_m": 208.2,
+      "end_snap_m": 179.0,
+      "routing_distance_m": 2515.4,
+      "travel_time_s": 210.6,
+      "edge_count": 14,
+      "snap_ms": 2.75,
+      "routing_ms": 10.6,
+      "api_ms": 16.85,
+      "direct_rows": 14
+    },
+    {
+      "start": [
+        103.72,
+        36.05
+      ],
+      "end": [
+        103.78,
+        36.06
+      ],
+      "start_snap_m": 58.2,
+      "end_snap_m": 96.2,
+      "routing_distance_m": 6800.3,
+      "travel_time_s": 565.8,
+      "edge_count": 29,
+      "snap_ms": 2.51,
+      "routing_ms": 11.56,
+      "api_ms": 17.83,
+      "direct_rows": 29
+    },
+    {
+      "start": [
+        103.78,
+        36.06
+      ],
+      "end": [
+        103.9,
+        36.08
+      ],
+      "start_snap_m": 96.2,
+      "end_snap_m": 159.7,
+      "routing_distance_m": 14316.3,
+      "travel_time_s": 1050.1,
+      "edge_count": 60,
+      "snap_ms": 2.55,
+      "routing_ms": 12.07,
+      "api_ms": 19.35,
+      "direct_rows": 60
+    }
+  ],
+  "point_to_point": [
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.7002652,
+        36.0914757
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 11880.4,
+      "travel_time_s": 804.2,
+      "edge_count": 34,
+      "snap_ms": 6.52,
+      "routing_ms": 15.19,
+      "api_ms": 27.39,
+      "direct_rows": 34
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.6765283,
+        36.099052
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 8363.7,
+      "travel_time_s": 502.5,
+      "edge_count": 18,
+      "snap_ms": 2.63,
+      "routing_ms": 10.91,
+      "api_ms": 16.74,
+      "direct_rows": 18
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.6900031,
+        36.0778413
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 13741.0,
+      "travel_time_s": 855.6,
+      "edge_count": 34,
+      "snap_ms": 2.34,
+      "routing_ms": 10.76,
+      "api_ms": 18.63,
+      "direct_rows": 34
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.6386182,
+        36.0939639
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 7573.0,
+      "travel_time_s": 619.8,
+      "edge_count": 31,
+      "snap_ms": 2.53,
+      "routing_ms": 12.31,
+      "api_ms": 16.56,
+      "direct_rows": 31
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.7481678,
+        36.0816078
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 16612.2,
+      "travel_time_s": 1038.3,
+      "edge_count": 48,
+      "snap_ms": 2.54,
+      "routing_ms": 10.65,
+      "api_ms": 16.51,
+      "direct_rows": 48
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.8600233,
+        36.0542244
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 28027.3,
+      "travel_time_s": 1763.5,
+      "edge_count": 84,
+      "snap_ms": 2.4,
+      "routing_ms": 11.25,
+      "api_ms": 20.38,
+      "direct_rows": 84
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.7814034,
+        36.0566506
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 21586.4,
+      "travel_time_s": 1366.9,
+      "edge_count": 74,
+      "snap_ms": 2.63,
+      "routing_ms": 13.21,
+      "api_ms": 19.58,
+      "direct_rows": 74
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.7546414,
+        36.0158082
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 26416.9,
+      "travel_time_s": 1869.1,
+      "edge_count": 77,
+      "snap_ms": 2.74,
+      "routing_ms": 13.3,
+      "api_ms": 19.64,
+      "direct_rows": 77
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.7612563,
+        36.0872985
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 19282.2,
+      "travel_time_s": 1206.7,
+      "edge_count": 55,
+      "snap_ms": 2.56,
+      "routing_ms": 11.51,
+      "api_ms": 18.75,
+      "direct_rows": 55
+    },
+    {
+      "start": [
+        103.6096571,
+        36.1409844
+      ],
+      "end": [
+        103.6921955,
+        36.1117337
+      ],
+      "start_snap_m": 0.0,
+      "end_snap_m": 0.0,
+      "routing_distance_m": 9571.7,
+      "travel_time_s": 779.1,
+      "edge_count": 18,
+      "snap_ms": 2.81,
+      "routing_ms": 12.67,
+      "api_ms": 17.02,
+      "direct_rows": 18
+    }
+  ],
+  "hospital": [
+    {
+      "origin": [
+        103.72,
+        36.05
+      ],
+      "best_poi_id": 58,
+      "best_name": "兰州第三医院",
+      "straight_distance_m": 1570.6,
+      "network_distance_m": 2498.9,
+      "travel_time_s": 270.9,
+      "facility_snap_m": 129.7,
+      "straight_best_poi_id": 58,
+      "straight_best_name": "兰州第三医院",
+      "straight_best_distance_m": 1570.6,
+      "straight_best_travel_time_s": 270.9,
+      "network_best_differs_from_straight": false,
+      "reachable_count": 57,
+      "unreachable_count": 1,
+      "snap_ms": 2.03,
+      "routing_ms": 24.65,
+      "api_ms": 30.05
+    },
+    {
+      "origin": [
+        103.78,
+        36.06
+      ],
+      "best_poi_id": 1138,
+      "best_name": "甘肃省妇幼保健院",
+      "straight_distance_m": 1271.7,
+      "network_distance_m": 2292.9,
+      "travel_time_s": 194.6,
+      "facility_snap_m": 81.3,
+      "straight_best_poi_id": 1086,
+      "straight_best_name": "第九四〇医院",
+      "straight_best_distance_m": 1111.7,
+      "straight_best_travel_time_s": 271.8,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 57,
+      "unreachable_count": 1,
+      "snap_ms": 2.07,
+      "routing_ms": 22.51,
+      "api_ms": 30.28
+    },
+    {
+      "origin": [
+        103.8343,
+        36.0611
+      ],
+      "best_poi_id": 1031,
+      "best_name": "甘肃玛利亚妇科医院",
+      "straight_distance_m": 679.4,
+      "network_distance_m": 1013.7,
+      "travel_time_s": 88.7,
+      "facility_snap_m": 62.5,
+      "straight_best_poi_id": 1229,
+      "straight_best_name": "兰州市第一人民医院城关医院",
+      "straight_best_distance_m": 646.1,
+      "straight_best_travel_time_s": 98.9,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 57,
+      "unreachable_count": 1,
+      "snap_ms": 2.03,
+      "routing_ms": 22.61,
+      "api_ms": 27.3
+    },
+    {
+      "origin": [
+        103.9,
+        36.08
+      ],
+      "best_poi_id": 1233,
+      "best_name": "兰州市口腔医院",
+      "straight_distance_m": 2379.4,
+      "network_distance_m": 4911.3,
+      "travel_time_s": 440.2,
+      "facility_snap_m": 86.5,
+      "straight_best_poi_id": 1106,
+      "straight_best_name": "兰州重离子医院",
+      "straight_best_distance_m": 2053.9,
+      "straight_best_travel_time_s": 666.2,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 57,
+      "unreachable_count": 1,
+      "snap_ms": 1.92,
+      "routing_ms": 23.88,
+      "api_ms": 31.07
+    },
+    {
+      "origin": [
+        104.0,
+        36.05
+      ],
+      "best_poi_id": 1106,
+      "best_name": "兰州重离子医院",
+      "straight_distance_m": 8301.1,
+      "network_distance_m": 11279.6,
+      "travel_time_s": 1007.2,
+      "facility_snap_m": 414.6,
+      "straight_best_poi_id": 1325,
+      "straight_best_name": "榆中县第三人民医院",
+      "straight_best_distance_m": 6292.8,
+      "straight_best_travel_time_s": 1160.4,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 57,
+      "unreachable_count": 1,
+      "snap_ms": 1.86,
+      "routing_ms": 22.09,
+      "api_ms": 30.66
+    }
+  ],
+  "fire_station": [
+    {
+      "origin": [
+        103.72,
+        36.05
+      ],
+      "best_poi_id": 45,
+      "best_name": null,
+      "straight_distance_m": 391.2,
+      "network_distance_m": 530.2,
+      "travel_time_s": 67.0,
+      "facility_snap_m": 92.2,
+      "straight_best_poi_id": 45,
+      "straight_best_name": null,
+      "straight_best_distance_m": 391.2,
+      "straight_best_travel_time_s": 67.0,
+      "network_best_differs_from_straight": false,
+      "reachable_count": 3,
+      "unreachable_count": 1,
+      "snap_ms": 1.75,
+      "routing_ms": 20.67,
+      "api_ms": 27.71
+    },
+    {
+      "origin": [
+        103.78,
+        36.06
+      ],
+      "best_poi_id": 2025,
+      "best_name": "七里河消防队",
+      "straight_distance_m": 1786.4,
+      "network_distance_m": 3133.3,
+      "travel_time_s": 241.1,
+      "facility_snap_m": 110.4,
+      "straight_best_poi_id": 2025,
+      "straight_best_name": "七里河消防队",
+      "straight_best_distance_m": 1786.4,
+      "straight_best_travel_time_s": 241.1,
+      "network_best_differs_from_straight": false,
+      "reachable_count": 3,
+      "unreachable_count": 1,
+      "snap_ms": 1.79,
+      "routing_ms": 20.62,
+      "api_ms": 30.82
+    },
+    {
+      "origin": [
+        103.8343,
+        36.0611
+      ],
+      "best_poi_id": 2025,
+      "best_name": "七里河消防队",
+      "straight_distance_m": 6116.5,
+      "network_distance_m": 7392.8,
+      "travel_time_s": 511.9,
+      "facility_snap_m": 110.4,
+      "straight_best_poi_id": 2267,
+      "straight_best_name": "兰州市南北两山消防中队",
+      "straight_best_distance_m": 5873.5,
+      "straight_best_travel_time_s": 547.4,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 3,
+      "unreachable_count": 1,
+      "snap_ms": 1.85,
+      "routing_ms": 23.1,
+      "api_ms": 29.33
+    },
+    {
+      "origin": [
+        103.9,
+        36.08
+      ],
+      "best_poi_id": 2267,
+      "best_name": "兰州市南北两山消防中队",
+      "straight_distance_m": 11231.9,
+      "network_distance_m": 13291.1,
+      "travel_time_s": 1012.5,
+      "facility_snap_m": 130.8,
+      "straight_best_poi_id": 2267,
+      "straight_best_name": "兰州市南北两山消防中队",
+      "straight_best_distance_m": 11231.9,
+      "straight_best_travel_time_s": 1012.5,
+      "network_best_differs_from_straight": false,
+      "reachable_count": 3,
+      "unreachable_count": 1,
+      "snap_ms": 1.77,
+      "routing_ms": 23.83,
+      "api_ms": 31.94
+    },
+    {
+      "origin": [
+        104.0,
+        36.05
+      ],
+      "best_poi_id": 2025,
+      "best_name": "七里河消防队",
+      "straight_distance_m": 21058.7,
+      "network_distance_m": 25778.8,
+      "travel_time_s": 1940.4,
+      "facility_snap_m": 110.4,
+      "straight_best_poi_id": 2267,
+      "straight_best_name": "兰州市南北两山消防中队",
+      "straight_best_distance_m": 20579.2,
+      "straight_best_travel_time_s": 1966.0,
+      "network_best_differs_from_straight": true,
+      "reachable_count": 3,
+      "unreachable_count": 1,
+      "snap_ms": 1.81,
+      "routing_ms": 27.7,
+      "api_ms": 34.91
+    }
+  ],
+  "performance": {
+    "point_to_point_10": {
+      "snap_ms": {
+        "average_ms": 2.97,
+        "median_ms": 2.59,
+        "max_ms": 6.52
+      },
+      "routing_ms": {
+        "average_ms": 12.18,
+        "median_ms": 11.91,
+        "max_ms": 15.19
+      },
+      "api_ms": {
+        "average_ms": 19.12,
+        "median_ms": 18.69,
+        "max_ms": 27.39
+      }
+    },
+    "hospital_5": {
+      "snap_ms": {
+        "average_ms": 1.98,
+        "median_ms": 2.03,
+        "max_ms": 2.07
+      },
+      "routing_ms": {
+        "average_ms": 23.15,
+        "median_ms": 22.61,
+        "max_ms": 24.65
+      },
+      "api_ms": {
+        "average_ms": 29.87,
+        "median_ms": 30.28,
+        "max_ms": 31.07
+      }
+    },
+    "fire_station_5": {
+      "snap_ms": {
+        "average_ms": 1.79,
+        "median_ms": 1.79,
+        "max_ms": 1.85
+      },
+      "routing_ms": {
+        "average_ms": 23.18,
+        "median_ms": 23.1,
+        "max_ms": 27.7
+      },
+      "api_ms": {
+        "average_ms": 30.94,
+        "median_ms": 30.82,
+        "max_ms": 34.91
+      }
+    }
+  },
+  "explain": {
+    "road_node_snap": [
+      "Limit  (cost=21.06..21.06 rows=1 width=16) (actual time=0.136..0.136 rows=1 loops=1)",
+      "  Buffers: shared hit=35",
+      "  ->  Sort  (cost=21.06..21.06 rows=1 width=16) (actual time=0.135..0.136 rows=1 loops=1)",
+      "        Sort Key: (((n.geometry)::geography <-> '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography)), n.osm_node_id",
+      "        Sort Method: top-N heapsort  Memory: 25kB",
+      "        Buffers: shared hit=35",
+      "        ->  Index Scan using idx_road_nodes_geography on road_nodes n  (cost=0.28..21.05 rows=1 width=16) (actual time=0.017..0.132 rows=25 loops=1)",
+      "              Index Cond: ((geometry)::geography && _st_expand('0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision))",
+      "              Filter: st_dwithin((geometry)::geography, '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision, true)",
+      "              Rows Removed by Filter: 39",
+      "              Buffers: shared hit=35",
+      "Planning Time: 0.060 ms",
+      "Execution Time: 0.143 ms"
+    ],
+    "facility_lookup": [
+      "Sort  (cost=121.52..121.53 rows=3 width=24) (actual time=4.371..4.373 rows=58 loops=1)",
+      "  Sort Key: p.id",
+      "  Sort Method: quicksort  Memory: 27kB",
+      "  Buffers: shared hit=1823",
+      "  ->  Nested Loop  (cost=31.08..121.50 rows=3 width=24) (actual time=0.071..4.354 rows=58 loops=1)",
+      "        Buffers: shared hit=1823",
+      "        ->  Bitmap Heap Scan on pois p  (cost=10.01..19.92 rows=3 width=40) (actual time=0.015..0.039 rows=58 loops=1)",
+      "              Recheck Cond: (((subcategory)::text = 'hospital'::text) AND ((category)::text = 'healthcare'::text))",
+      "              Heap Blocks: exact=23",
+      "              Buffers: shared hit=27",
+      "              ->  BitmapAnd  (cost=10.01..10.01 rows=3 width=0) (actual time=0.012..0.013 rows=0 loops=1)",
+      "                    Buffers: shared hit=4",
+      "                    ->  Bitmap Index Scan on ix_pois_subcategory  (cost=0.00..4.71 rows=58 width=0) (actual time=0.007..0.007 rows=58 loops=1)",
+      "                          Index Cond: ((subcategory)::text = 'hospital'::text)",
+      "                          Buffers: shared hit=2",
+      "                    ->  Bitmap Index Scan on ix_pois_category  (cost=0.00..5.04 rows=102 width=0) (actual time=0.004..0.004 rows=102 loops=1)",
+      "                          Index Cond: ((category)::text = 'healthcare'::text)",
+      "                          Buffers: shared hit=2",
+      "        ->  Limit  (cost=21.07..33.84 rows=1 width=24) (actual time=0.074..0.074 rows=1 loops=58)",
+      "              Buffers: shared hit=1796",
+      "              ->  Result  (cost=21.07..33.84 rows=1 width=24) (actual time=0.074..0.074 rows=1 loops=58)",
+      "                    Buffers: shared hit=1796",
+      "                    ->  Sort  (cost=21.07..21.07 rows=1 width=48) (actual time=0.073..0.073 rows=1 loops=58)",
+      "                          Sort Key: (((n.geometry)::geography <-> (p.geometry)::geography)), n.osm_node_id",
+      "                          Sort Method: top-N heapsort  Memory: 25kB",
+      "                          Buffers: shared hit=1796",
+      "                          ->  Index Scan using idx_road_nodes_geography on road_nodes n  (cost=0.28..21.05 rows=1 width=48) (actual time=0.009..0.070 rows=36 loops=58)",
+      "                                Index Cond: ((geometry)::geography && _st_expand((p.geometry)::geography, '500'::double precision))",
+      "                                Filter: st_dwithin((geometry)::geography, (p.geometry)::geography, '500'::double precision, true)",
+      "                                Rows Removed by Filter: 24",
+      "                                Buffers: shared hit=1796",
+      "Planning:",
+      "  Buffers: shared hit=64",
+      "Planning Time: 0.136 ms",
+      "Execution Time: 4.388 ms"
+    ]
+  }
+}
