@@ -146,6 +146,49 @@ button { font: inherit; }
 .route-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .route-popup { min-width: 200px; }
 
+.emergency-panel { display: flex; flex-direction: column; gap: 10px; margin: 14px 5px 0; }
+.emergency-type { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; background: #efe9e7; border-radius: 8px; }
+.emergency-type button { padding: 8px 4px; color: #765f59; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 700; }
+.emergency-type button.is-active { color: #8d3028; background: #fff; box-shadow: 0 1px 4px rgba(84, 41, 35, 0.13); }
+.emergency-instruction { display: flex; flex-direction: column; gap: 5px; padding: 12px; color: #633f39; background: #f8ece9; border: 1px solid #ead2cd; border-radius: 9px; }
+.emergency-instruction .section-kicker { margin: 0 0 3px; color: #a06056; }
+.emergency-instruction strong { color: #77372f; font-size: 11px; }
+.emergency-instruction > span:last-child { color: #846c67; font-size: 9px; line-height: 1.45; }
+.incident-row { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 6px; padding: 8px 9px; background: #fff; border: 1px solid #e6dfdd; border-radius: 7px; }
+.incident-row span { color: #887974; font-size: 9px; }
+.incident-row b { color: #59443f; font: 650 9px/1.2 ui-monospace, Consolas, monospace; text-align: right; }
+.emergency-message { margin: 0; padding: 9px 10px; color: #766b68; background: #fff; border: 1px solid #e6dfdd; border-radius: 7px; font-size: 9px; line-height: 1.45; }
+.emergency-message.is-loading, .emergency-message.is-success { color: #8d3028; }
+.emergency-message.is-snap_failed, .emergency-message.is-no_facilities, .emergency-message.is-error { color: #a3473c; background: #fff4f2; border-color: #edd7d2; }
+.emergency-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.emergency-metrics > div { display: flex; flex-direction: column; gap: 3px; padding: 9px; background: #fff; border: 1px solid #e6dfdd; border-radius: 7px; }
+.emergency-metrics span { color: #887974; font-size: 8px; }
+.emergency-metrics strong { color: #77372f; font: 750 11px/1.2 ui-monospace, Consolas, monospace; }
+.responder-best { display: flex; flex-direction: column; gap: 3px; padding: 10px; color: #77372f; background: #fff0ed; border: 1px solid #e8c9c2; border-radius: 7px; }
+.responder-best span { color: #a04e43; font-size: 8px; font-weight: 800; letter-spacing: 0.08em; }
+.responder-best strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.responder-best small, .responder-list small { color: #887b77; font-size: 8px; }
+.network-comparison { margin: 0; padding: 8px 9px; color: #8b5b23; background: #fff8e8; border: 1px solid #eadbb7; border-radius: 7px; font-size: 9px; line-height: 1.4; }
+.responder-list { display: flex; flex-direction: column; gap: 2px; }
+.responder-list button { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; padding: 7px 6px; color: #5a4945; background: transparent; border: 0; border-radius: 6px; text-align: left; cursor: pointer; }
+.responder-list button:hover { background: #f3eae8; }
+.responder-list button > span { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.responder-list button b { max-width: 158px; overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.responder-list button > strong { flex: 0 0 auto; color: #8d3028; font: 750 9px/1 ui-monospace, Consolas, monospace; }
+.response-bands { display: grid; gap: 5px; }
+.response-band { display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 6px; padding: 9px; background: #fff; border: 1px solid #e6dfdd; border-left: 4px solid #4b76c5; border-radius: 7px; }
+.response-band.is-10 { border-left-color: #2a9d8f; }
+.response-band.is-5 { border-left-color: #f2a93b; }
+.response-band strong { color: #59443f; font-size: 10px; }
+.response-band span { color: #887974; font-size: 9px; }
+.response-band b { color: #77372f; font: 750 10px/1.2 ui-monospace, Consolas, monospace; }
+.facility-statistics, .emergency-disclaimer { margin: 0; color: #887b77; font-size: 8px; line-height: 1.45; text-align: center; }
+.emergency-disclaimer { padding-top: 2px; color: #96766f; }
+.emergency-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.emergency-actions button { padding: 8px 4px; color: #765f59; background: #fff; border: 1px solid #dfd3d0; border-radius: 7px; cursor: pointer; font-size: 9px; font-weight: 700; }
+.emergency-actions button:hover:not(:disabled) { color: #8d3028; border-color: #c79d95; }
+.emergency-actions button:disabled { cursor: default; opacity: 0.45; }
+
 .map-main { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; padding: 0; }
 .map-panel, .map-container { position: absolute; inset: 0; }
 .map-panel { overflow: hidden; background: #e4e9e6; }

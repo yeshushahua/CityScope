@@ -8,6 +8,7 @@ import {
   checkHealth,
   fetchNearbyPois,
   fetchIsochrone,
+  fetchEmergencyResponse,
   fetchNearestFacility,
   fetchShortestPath,
   fetchSpatialSummary,
@@ -29,6 +30,7 @@ import type {
   RoutingStatus,
   ShortestPathResponse,
 } from './types/routing'
+import type { EmergencyResponse, EmergencyStatus, IncidentType } from './types/emergency'
 
 export type ApiStatus = 'checking' | 'online' | 'offline'
 
@@ -53,6 +55,10 @@ export default function App() {
   const [shortestResult, setShortestResult] = useState<ShortestPathResponse | null>(null)
   const [nearestResult, setNearestResult] = useState<NearestFacilityResponse | null>(null)
   const [isochroneResult, setIsochroneResult] = useState<IsochroneResponse | null>(null)
+  const [incidentType, setIncidentType] = useState<IncidentType>('medical')
+  const [incident, setIncident] = useState<QueryCenter | null>(null)
+  const [emergencyStatus, setEmergencyStatus] = useState<EmergencyStatus>('selecting')
+  const [emergencyResult, setEmergencyResult] = useState<EmergencyResponse | null>(null)
 
   useEffect(() => {
     let active = true
@@ -135,6 +141,32 @@ export default function App() {
     return () => controller.abort()
   }, [activeModule, routeStart, routeEnd, routingMode, facilityPreset])
 
+  useEffect(() => {
+    if (activeModule !== 'emergency') return
+    if (!incident) {
+      setEmergencyStatus('selecting')
+      return
+    }
+    const controller = new AbortController()
+    setEmergencyStatus('loading')
+    setEmergencyResult(null)
+    fetchEmergencyResponse(incident, incidentType, controller.signal)
+      .then((result) => {
+        if (controller.signal.aborted) return
+        setEmergencyResult(result)
+        setEmergencyStatus('success')
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return
+        const status = isAxiosError(error) ? error.response?.status : undefined
+        const detail = isAxiosError(error) ? String(error.response?.data?.detail ?? '') : ''
+        if (status === 422 && detail.includes('road network node')) setEmergencyStatus('snap_failed')
+        else if (status === 404) setEmergencyStatus('no_facilities')
+        else setEmergencyStatus('error')
+      })
+    return () => controller.abort()
+  }, [activeModule, incident, incidentType])
+
   const selectModule = useCallback((moduleId: ModuleId) => setActiveModule(moduleId), [])
   const toggleLayer = useCallback((layer: keyof LayerVisibility) => {
     setLayers((current) => ({ ...current, [layer]: !current[layer] }))
@@ -180,6 +212,15 @@ export default function App() {
       setRouteEnd(point)
     }
   }, [routingMode, routeStart, routeEnd])
+  const changeIncidentType = useCallback((value: IncidentType) => {
+    setIncidentType(value)
+    setEmergencyResult(null)
+  }, [])
+  const clearEmergency = useCallback(() => {
+    setIncident(null)
+    setEmergencyResult(null)
+    setEmergencyStatus('selecting')
+  }, [])
 
   return (
     <div className="app-shell">
@@ -213,6 +254,13 @@ export default function App() {
           onFacilityPresetChange={setFacilityPreset}
           onClearRouting={clearRouting}
           onClearRoutingResult={clearRoutingResult}
+          incidentType={incidentType}
+          incident={incident}
+          emergencyStatus={emergencyStatus}
+          emergencyResult={emergencyResult}
+          onIncidentTypeChange={changeIncidentType}
+          onClearEmergency={clearEmergency}
+          onReselectIncident={clearEmergency}
         />
         <main className="map-main" aria-label="兰州市地图工作区">
           <CityMap
@@ -232,6 +280,10 @@ export default function App() {
             nearestResult={nearestResult}
             isochroneResult={isochroneResult}
             onSelectRoutingPoint={selectRoutingPoint}
+            emergencyModeActive={activeModule === 'emergency'}
+            incident={incident}
+            emergencyResult={emergencyResult}
+            onSelectIncident={setIncident}
           />
         </main>
       </div>

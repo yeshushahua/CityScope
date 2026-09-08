@@ -41,9 +41,13 @@ export function addIsochroneLayers(map: Map, visible: boolean): void {
   }
 }
 
-export function setIsochroneData(map: Map, result: IsochroneResponse | null): void {
+export function setIsochroneData(
+  map: Map,
+  result: IsochroneResponse | IsochroneResponse['isochrones'] | null,
+): void {
+  const collection = result && 'isochrones' in result ? result.isochrones : result
   ;(map.getSource(ISOCHRONE_SOURCE_ID) as GeoJSONSource | undefined)?.setData(
-    result?.isochrones ?? EMPTY,
+    collection ?? EMPTY,
   )
 }
 

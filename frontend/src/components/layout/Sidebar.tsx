@@ -7,6 +7,8 @@ import type {
 } from '../../types/spatial'
 import SpatialQueryPanel from '../spatial/SpatialQueryPanel'
 import RoutingPanel from '../routing/RoutingPanel'
+import EmergencyPanel from '../emergency/EmergencyPanel'
+import type { EmergencyResponse, EmergencyStatus, IncidentType } from '../../types/emergency'
 import type {
   FacilityPreset,
   IsochroneResponse,
@@ -47,13 +49,20 @@ interface SidebarProps {
   onFacilityPresetChange: (preset: FacilityPreset) => void
   onClearRouting: () => void
   onClearRoutingResult: () => void
+  incidentType: IncidentType
+  incident: QueryCenter | null
+  emergencyStatus: EmergencyStatus
+  emergencyResult: EmergencyResponse | null
+  onIncidentTypeChange: (value: IncidentType) => void
+  onClearEmergency: () => void
+  onReselectIncident: () => void
 }
 
 const MODULES: ReadonlyArray<{ id: ModuleId; label: string; description: string }> = [
   { id: 'overview', label: '城市总览', description: '浏览兰州市基础地图' },
   { id: 'spatial', label: '空间查询', description: '按点击位置执行 PostGIS 范围查询' },
   { id: 'routing', label: '路径规划', description: '计算最短路径、最快设施与道路时间可达圈' },
-  { id: 'emergency', label: '应急响应', description: '功能将在后续阶段开放' },
+  { id: 'emergency', label: '应急响应', description: '医疗与消防响应决策支持' },
   { id: 'accessibility', label: '可达性分析', description: '功能将在后续阶段开放' },
 ]
 
@@ -85,6 +94,13 @@ export default function Sidebar({
   onFacilityPresetChange,
   onClearRouting,
   onClearRoutingResult,
+  incidentType,
+  incident,
+  emergencyStatus,
+  emergencyResult,
+  onIncidentTypeChange,
+  onClearEmergency,
+  onReselectIncident,
 }: SidebarProps) {
   const activeItem = MODULES.find((item) => item.id === activeModule) ?? MODULES[0]
 
@@ -162,15 +178,27 @@ export default function Sidebar({
           onFocus={onFocusPoi}
         />
       )}
+      {activeModule === 'emergency' && (
+        <EmergencyPanel
+          incidentType={incidentType}
+          status={emergencyStatus}
+          incident={incident}
+          result={emergencyResult}
+          onIncidentTypeChange={onIncidentTypeChange}
+          onClear={onClearEmergency}
+          onReselect={onReselectIncident}
+          onFocus={onFocusPoi}
+        />
+      )}
       <div className={`database-status${databaseOnline ? ' is-online' : ''}`} role="status">
         <span className="status-dot" aria-hidden="true" />
         PostGIS {databaseOnline ? 'Connected' : 'Unavailable'}
       </div>
-      {activeModule !== 'spatial' && activeModule !== 'routing' && <div className="module-note" role="status" aria-live="polite">
+      {activeModule !== 'spatial' && activeModule !== 'routing' && activeModule !== 'emergency' && <div className="module-note" role="status" aria-live="polite">
         <strong>{activeItem.label}</strong>
         <span>{activeItem.description}</span>
       </div>}
-      <div className="phase-label">PHASE 6 · NETWORK ISOCHRONE</div>
+      <div className="phase-label">PHASE 7 · EMERGENCY RESPONSE</div>
     </aside>
   )
 }

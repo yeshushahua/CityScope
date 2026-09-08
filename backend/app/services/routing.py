@@ -235,6 +235,20 @@ def _route_feature(
     )
 
 
+def build_route_between_nodes(
+    db: Session,
+    *,
+    start_node: int,
+    end_node: int,
+    zero_coordinate: tuple[float, float] | None = None,
+) -> RouteFeature:
+    """Build one directed route from the fixed backend-owned routing graph."""
+    return _route_feature(
+        _path_rows(db, start_node, end_node),
+        zero_coordinate=zero_coordinate if start_node == end_node else None,
+    )
+
+
 def shortest_path(
     db: Session,
     *,
@@ -472,12 +486,27 @@ def isochrone(
     origin_snap = snap_point_to_network(
         db, lon=origin.lon, lat=origin.lat, max_snap_m=max_snap_m
     )
+    features = build_isochrones_from_node(db, start_node=origin_snap.node_id)
+
+    return IsochroneResponse(
+        origin=origin,
+        snap=origin_snap,
+        isochrones=features,
+    )
+
+
+def build_isochrones_from_node(
+    db: Session,
+    *,
+    start_node: int,
+) -> IsochroneFeatureCollection:
+    """Build fixed outward 5/10/15-minute bands from an existing road node."""
     rows = list(
         db.execute(
             text(ISOCHRONE_SQL),
             {
                 "edges_sql": EDGES_SQL,
-                "start_node": origin_snap.node_id,
+                "start_node": start_node,
                 "hull_target_percent": CONCAVE_HULL_TARGET_PERCENT,
                 "fallback_buffer_m": DEGENERATE_BUFFER_M,
                 "nesting_tolerance_m": NESTING_TOLERANCE_M,
@@ -514,8 +543,4 @@ def isochrone(
             )
         )
 
-    return IsochroneResponse(
-        origin=origin,
-        snap=origin_snap,
-        isochrones=IsochroneFeatureCollection(features=features),
-    )
+    return IsochroneFeatureCollection(features=features)

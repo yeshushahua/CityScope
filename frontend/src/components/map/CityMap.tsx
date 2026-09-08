@@ -22,6 +22,7 @@ import type { MapCoordinatesValue, MapLoadStatus } from '../../types/map'
 import type { LayerCounts, PoiProperties, RoadProperties } from '../../types/geojson'
 import type { FocusPoint, NearbyPoiCollection, QueryCenter } from '../../types/spatial'
 import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../types/routing'
+import type { EmergencyResponse } from '../../types/emergency'
 import { fetchBuildings, fetchNetworkEdges, fetchPois } from '../../services/api'
 import MapCoordinates from './MapCoordinates'
 import MapStatus from './MapStatus'
@@ -55,6 +56,14 @@ import {
   setIsochroneData,
   setIsochroneVisibility,
 } from './layers/isochroneLayer'
+import {
+  addEmergencyLayers,
+  EMERGENCY_FACILITY_LAYER_ID,
+  EMERGENCY_ROUTE_LAYER_ID,
+  setEmergencyData,
+  setEmergencyVisibility,
+  type EmergencyMapProperties,
+} from './layers/emergencyResultLayer'
 
 setWorkerUrl(workerUrl)
 
@@ -176,6 +185,27 @@ function createRoutingPopupContent(properties: RoutingPopupProperties): HTMLElem
   return content
 }
 
+function createEmergencyPopupContent(properties: EmergencyMapProperties): HTMLElement {
+  const content = document.createElement('div')
+  content.className = 'coordinate-popup route-popup'
+  const title = document.createElement('strong')
+  title.textContent = properties.label || '应急响应结果'
+  content.append(title)
+  const values = [
+    properties.network_rank ? `网络响应排名：#${properties.network_rank}` : null,
+    typeof properties.response_time_min === 'number' ? `预计响应：${properties.response_time_min.toFixed(2)} min` : null,
+    typeof properties.network_distance_m === 'number' ? `道路距离：${properties.network_distance_m.toFixed(0)} m` : null,
+    typeof properties.straight_distance_m === 'number' ? `直线距离：${properties.straight_distance_m.toFixed(0)} m` : null,
+    properties.category ? `设施类型：${properties.category} / ${properties.subcategory}` : null,
+  ]
+  content.append(...values.filter((value): value is string => Boolean(value)).map((value) => {
+    const line = document.createElement('span')
+    line.textContent = value
+    return line
+  }))
+  return content
+}
+
 interface CityMapProps {
   layers: LayerVisibility
   onLayerCountsChange: (counts: LayerCounts) => void
@@ -193,6 +223,10 @@ interface CityMapProps {
   nearestResult: NearestFacilityResponse | null
   isochroneResult: IsochroneResponse | null
   onSelectRoutingPoint: (point: QueryCenter) => void
+  emergencyModeActive: boolean
+  incident: QueryCenter | null
+  emergencyResult: EmergencyResponse | null
+  onSelectIncident: (point: QueryCenter) => void
 }
 
 export default function CityMap({
@@ -212,6 +246,10 @@ export default function CityMap({
   nearestResult,
   isochroneResult,
   onSelectRoutingPoint,
+  emergencyModeActive,
+  incident,
+  emergencyResult,
+  onSelectIncident,
 }: CityMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<Map | null>(null)
@@ -235,6 +273,10 @@ export default function CityMap({
   const nearestResultRef = useRef(nearestResult)
   const isochroneResultRef = useRef(isochroneResult)
   const selectRoutingPointRef = useRef(onSelectRoutingPoint)
+  const emergencyModeActiveRef = useRef(emergencyModeActive)
+  const incidentRef = useRef(incident)
+  const emergencyResultRef = useRef(emergencyResult)
+  const selectIncidentRef = useRef(onSelectIncident)
   const [coordinates, setCoordinates] = useState<MapCoordinatesValue | null>(null)
   const [loadStatus, setLoadStatus] = useState<MapLoadStatus>('loading')
 
@@ -242,7 +284,7 @@ export default function CityMap({
     layersRef.current = layers
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layers.pois && !spatialModeRef.current && !routingModeActiveRef.current)
+    setPoiVisibility(map, layers.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
     setBuildingVisibility(map, layers.buildings)
     setRoadVisibility(map, layers.roads)
     if (layers.buildings) {
@@ -270,7 +312,7 @@ export default function CityMap({
     selectQueryCenterRef.current = onSelectQueryCenter
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layersRef.current.pois && !spatialMode && !routingModeActiveRef.current)
+    setPoiVisibility(map, layersRef.current.pois && !spatialMode && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
     setSpatialQueryVisibility(map, spatialMode)
     setSpatialQueryData(map, queryCenter, queryRadiusM, queryResults)
   }, [spatialMode, queryCenter, queryRadiusM, queryResults, onSelectQueryCenter])
@@ -286,12 +328,36 @@ export default function CityMap({
     selectRoutingPointRef.current = onSelectRoutingPoint
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive)
+    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive && !emergencyModeActiveRef.current)
     setRoutingVisibility(map, routingModeActive)
-    setIsochroneVisibility(map, routingModeActive && routingMode === 'isochrone')
-    setIsochroneData(map, isochroneResult)
+    if (routingModeActive) {
+      setIsochroneVisibility(map, routingMode === 'isochrone')
+      setIsochroneData(map, isochroneResult)
+    } else if (!emergencyModeActiveRef.current) {
+      setIsochroneVisibility(map, false)
+      setIsochroneData(map, null)
+    }
     setRoutingData(map, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult)
   }, [routingModeActive, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult, onSelectRoutingPoint])
+
+  useEffect(() => {
+    emergencyModeActiveRef.current = emergencyModeActive
+    incidentRef.current = incident
+    emergencyResultRef.current = emergencyResult
+    selectIncidentRef.current = onSelectIncident
+    const map = mapRef.current
+    if (!map || !map.loaded()) return
+    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActive)
+    setEmergencyVisibility(map, emergencyModeActive)
+    setEmergencyData(map, incident, emergencyResult)
+    if (emergencyModeActive) {
+      setIsochroneData(map, emergencyResult?.response_isochrones ?? null)
+      setIsochroneVisibility(map, Boolean(emergencyResult))
+    } else if (!routingModeActiveRef.current) {
+      setIsochroneData(map, null)
+      setIsochroneVisibility(map, false)
+    }
+  }, [emergencyModeActive, incident, emergencyResult, onSelectIncident])
 
   useEffect(() => {
     if (!focusPoint) return
@@ -394,10 +460,11 @@ export default function CityMap({
       hasLoaded = true
       addRoadLayer(map, layersRef.current.roads)
       addBuildingLayer(map, layersRef.current.buildings)
-      addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current)
+      addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
       addSpatialQueryLayers(map, spatialModeRef.current)
-      addIsochroneLayers(map, routingModeActiveRef.current && routingModeRef.current === 'isochrone')
+      addIsochroneLayers(map, (routingModeActiveRef.current && routingModeRef.current === 'isochrone') || Boolean(emergencyModeActiveRef.current && emergencyResultRef.current))
       addRoutingLayers(map, routingModeActiveRef.current)
+      addEmergencyLayers(map, emergencyModeActiveRef.current)
       setSpatialQueryData(
         map,
         queryCenterRef.current,
@@ -413,7 +480,12 @@ export default function CityMap({
         nearestResultRef.current,
         isochroneResultRef.current,
       )
-      setIsochroneData(map, isochroneResultRef.current)
+      setEmergencyData(map, incidentRef.current, emergencyResultRef.current)
+      if (emergencyModeActiveRef.current && emergencyResultRef.current) {
+        setIsochroneData(map, emergencyResultRef.current.response_isochrones)
+      } else {
+        setIsochroneData(map, isochroneResultRef.current)
+      }
       map.on('click', POI_LAYER_ID, handlePoiClick)
       map.on('mouseenter', POI_LAYER_ID, () => { map.getCanvas().style.cursor = 'pointer' })
       map.on('mouseleave', POI_LAYER_ID, () => { map.getCanvas().style.cursor = '' })
@@ -431,6 +503,20 @@ export default function CityMap({
     }
     const handleClick = (event: MapMouseEvent) => {
       popupRef.current?.remove()
+      if (emergencyModeActiveRef.current) {
+        const feature = map.queryRenderedFeatures(event.point, {
+          layers: [EMERGENCY_FACILITY_LAYER_ID, EMERGENCY_ROUTE_LAYER_ID],
+        })[0]
+        if (feature?.properties) {
+          popupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 12 })
+            .setLngLat(event.lngLat)
+            .setDOMContent(createEmergencyPopupContent(feature.properties as EmergencyMapProperties))
+            .addTo(map)
+          return
+        }
+        selectIncidentRef.current({ lon: event.lngLat.lng, lat: event.lngLat.lat })
+        return
+      }
       if (routingModeActiveRef.current) {
         const feature = map.queryRenderedFeatures(event.point, {
           layers: [ROUTE_FACILITY_LAYER_ID, ROUTE_LINE_LAYER_ID],
@@ -481,7 +567,7 @@ export default function CityMap({
         .addTo(map)
     }
     const handlePoiClick = (event: MapLayerMouseEvent) => {
-      if (spatialModeRef.current || routingModeActiveRef.current) return
+      if (spatialModeRef.current || routingModeActiveRef.current || emergencyModeActiveRef.current) return
       const poiFeature = event.features?.[0]
       if (!poiFeature?.properties) return
       popupRef.current?.remove()

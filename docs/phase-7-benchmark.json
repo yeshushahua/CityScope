@@ -1,0 +1,1837 @@
+{
+  "generated_at": "2026-09-08T23:24:12.678648+08:00",
+  "method": {
+    "incident_types": [
+      "medical",
+      "fire"
+    ],
+    "medical_filter": [
+      "healthcare",
+      "hospital"
+    ],
+    "fire_filter": [
+      "emergency",
+      "fire_station"
+    ],
+    "routing_direction": "facility_to_incident",
+    "candidate_algorithm": "pgr_dijkstraCost_many_sources_to_one_target",
+    "best_route_algorithm": "pgr_dijkstra",
+    "cost_model": "static_travel_time",
+    "directed": true,
+    "candidate_limit": 3,
+    "isochrone_thresholds_s": [
+      300,
+      600,
+      900
+    ]
+  },
+  "database": {
+    "postgresql": "PostgreSQL 16.4 (Debian 16.4-1.pgdg110+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit",
+    "postgis": "POSTGIS=\"3.4.3 e365945\" [EXTENSION] PGSQL=\"160\" GEOS=\"3.9.0-CAPI-1.16.2\" PROJ=\"7.2.1 NETWORK_ENABLED=OFF URL_ENDPOINT=https://cdn.proj.org USER_WRITABLE_DIRECTORY=/var/lib/postgresql/.local/share/proj DATABASE_PATH=/usr/share/proj/proj.db\" LIBXML=\"2.9.10\" LIBJSON=\"0.15\" LIBPROTOBUF=\"1.3.3\" WAGYU=\"0.5.0 (Internal)\" TOPOLOGY",
+    "pgrouting": "3.8.0",
+    "road_nodes": 8286,
+    "routing_edges": 18441,
+    "pois": 2308,
+    "poi_routing_access": 106
+  },
+  "cases": [
+    {
+      "label": "medical_center",
+      "incident_type": "medical",
+      "incident": {
+        "lon": 103.8343,
+        "lat": 36.0611
+      },
+      "incident_snap": {
+        "node_id": 4077238566,
+        "node_lon": 103.8333381,
+        "node_lat": 36.0593936,
+        "snap_distance_m": 208.2
+      },
+      "facility_statistics": {
+        "total": 58,
+        "mapped": 58,
+        "unmapped": 0,
+        "reachable": 57,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 1229,
+        "osm_type": "way",
+        "osm_id": "1435092759",
+        "name": "兰州市第一人民医院城关医院",
+        "category": "healthcare",
+        "subcategory": "hospital",
+        "lon": 103.82729284380099,
+        "lat": 36.0598624,
+        "node_id": 2728608495,
+        "facility_snap_distance_m": 109.9,
+        "straight_distance_m": 646.1,
+        "response_time_s": 44.8,
+        "response_time_min": 0.75
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 1229,
+          "osm_type": "way",
+          "osm_id": "1435092759",
+          "name": "兰州市第一人民医院城关医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.82729284380099,
+          "lat": 36.0598624,
+          "node_id": 2728608495,
+          "facility_snap_distance_m": 109.9,
+          "straight_distance_m": 646.1,
+          "response_time_s": 44.8,
+          "response_time_min": 0.75
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 607,
+          "osm_type": "node",
+          "osm_id": "5249078097",
+          "name": "亚东五官科医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.8290071,
+          "lat": 36.052687,
+          "node_id": 2295801985,
+          "facility_snap_distance_m": 25.7,
+          "straight_distance_m": 1048.3,
+          "response_time_s": 90.2,
+          "response_time_min": 1.5
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 1031,
+          "osm_type": "way",
+          "osm_id": "425568288",
+          "name": "甘肃玛利亚妇科医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.83439536824375,
+          "lat": 36.054977449999996,
+          "node_id": 4017014258,
+          "facility_snap_distance_m": 62.5,
+          "straight_distance_m": 679.4,
+          "response_time_s": 96.5,
+          "response_time_min": 1.61
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 460.5,
+        "response_time_s": 44.8,
+        "response_time_min": 0.75,
+        "edge_count": 4,
+        "edge_ids": [
+          3790,
+          12611,
+          3794,
+          3788
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 1053,
+          "area_m2": 19524073.3,
+          "area_km2": 19.524
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 3223,
+          "area_m2": 85186742.7,
+          "area_km2": 85.187
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4687,
+          "area_m2": 207331208.8,
+          "area_km2": 207.331
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 1229,
+        "network_best_facility_id": 1229,
+        "straight_nearest_is_network_best": true
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 1031,
+        "best_name": "甘肃玛利亚妇科医院",
+        "travel_time_s": 88.7,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 58,
+      "reachable_node_count": 57,
+      "facility_total": 58,
+      "timing_ms": {
+        "incident_snap": 2.176,
+        "facility_lookup": 2.133,
+        "candidate_routing": 17.174,
+        "best_route": 14.19,
+        "isochrone": 114.546,
+        "total_api": 152.448
+      }
+    },
+    {
+      "label": "medical_qilihe",
+      "incident_type": "medical",
+      "incident": {
+        "lon": 103.78,
+        "lat": 36.06
+      },
+      "incident_snap": {
+        "node_id": 11293237374,
+        "node_lon": 103.7801783,
+        "node_lat": 36.059145,
+        "snap_distance_m": 96.2
+      },
+      "facility_statistics": {
+        "total": 58,
+        "mapped": 58,
+        "unmapped": 0,
+        "reachable": 57,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 1022,
+        "osm_type": "way",
+        "osm_id": "421614865",
+        "name": "七里河区中药医院",
+        "category": "healthcare",
+        "subcategory": "hospital",
+        "lon": 103.79975085070964,
+        "lat": 36.05490575,
+        "node_id": 2517090746,
+        "facility_snap_distance_m": 47.0,
+        "straight_distance_m": 1867.1,
+        "response_time_s": 176.7,
+        "response_time_min": 2.94
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 1022,
+          "osm_type": "way",
+          "osm_id": "421614865",
+          "name": "七里河区中药医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.79975085070964,
+          "lat": 36.05490575,
+          "node_id": 2517090746,
+          "facility_snap_distance_m": 47.0,
+          "straight_distance_m": 1867.1,
+          "response_time_s": 176.7,
+          "response_time_min": 2.94
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 1138,
+          "osm_type": "way",
+          "osm_id": "695845448",
+          "name": "甘肃省妇幼保健院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.7748683231213,
+          "lat": 36.0706768,
+          "node_id": 4174779689,
+          "facility_snap_distance_m": 81.3,
+          "straight_distance_m": 1271.7,
+          "response_time_s": 218.3,
+          "response_time_min": 3.64
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 626,
+          "osm_type": "node",
+          "osm_id": "6322556433",
+          "name": null,
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.8070162,
+          "lat": 36.0627248,
+          "node_id": 2297168655,
+          "facility_snap_distance_m": 43.2,
+          "straight_distance_m": 2452.7,
+          "response_time_s": 256.6,
+          "response_time_min": 4.28
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 2306.1,
+        "response_time_s": 176.7,
+        "response_time_min": 2.94,
+        "edge_count": 13,
+        "edge_ids": [
+          3682,
+          3684,
+          2145,
+          2130,
+          10264,
+          10268,
+          16441,
+          10269,
+          3547,
+          2142,
+          2131,
+          8883,
+          2233
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 494,
+          "area_m2": 11805323.6,
+          "area_km2": 11.805
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2438,
+          "area_m2": 88534806.6,
+          "area_km2": 88.535
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4768,
+          "area_m2": 192685336.0,
+          "area_km2": 192.685
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 1086,
+        "network_best_facility_id": 1022,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 1138,
+        "best_name": "甘肃省妇幼保健院",
+        "travel_time_s": 194.6,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 58,
+      "reachable_node_count": 57,
+      "facility_total": 58,
+      "timing_ms": {
+        "incident_snap": 2.381,
+        "facility_lookup": 2.19,
+        "candidate_routing": 18.219,
+        "best_route": 15.575,
+        "isochrone": 114.418,
+        "total_api": 150.88
+      }
+    },
+    {
+      "label": "medical_west",
+      "incident_type": "medical",
+      "incident": {
+        "lon": 103.68,
+        "lat": 36.09
+      },
+      "incident_snap": {
+        "node_id": 5636152833,
+        "node_lon": 103.6787322,
+        "node_lat": 36.0921946,
+        "snap_distance_m": 269.0
+      },
+      "facility_statistics": {
+        "total": 58,
+        "mapped": 58,
+        "unmapped": 0,
+        "reachable": 57,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 1828,
+        "osm_type": "way",
+        "osm_id": "410811968",
+        "name": "兰州安新大医院",
+        "category": "healthcare",
+        "subcategory": "hospital",
+        "lon": 103.68440363756466,
+        "lat": 36.10765915,
+        "node_id": 8509826371,
+        "facility_snap_distance_m": 202.1,
+        "straight_distance_m": 1999.2,
+        "response_time_s": 234.2,
+        "response_time_min": 3.9
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 1828,
+          "osm_type": "way",
+          "osm_id": "410811968",
+          "name": "兰州安新大医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.68440363756466,
+          "lat": 36.10765915,
+          "node_id": 8509826371,
+          "facility_snap_distance_m": 202.1,
+          "straight_distance_m": 1999.2,
+          "response_time_s": 234.2,
+          "response_time_min": 3.9
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 1978,
+          "osm_type": "way",
+          "osm_id": "914198418",
+          "name": "天奇中西医结合医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.69307422729318,
+          "lat": 36.07858855,
+          "node_id": 4091364611,
+          "facility_snap_distance_m": 209.8,
+          "straight_distance_m": 1729.2,
+          "response_time_s": 258.4,
+          "response_time_min": 4.31
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 1431,
+          "osm_type": "node",
+          "osm_id": "4329885650",
+          "name": "省医院西院区",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.7105995,
+          "lat": 36.0753195,
+          "node_id": 9504350710,
+          "facility_snap_distance_m": 69.5,
+          "straight_distance_m": 3201.5,
+          "response_time_s": 352.3,
+          "response_time_min": 5.87
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 2904.2,
+        "response_time_s": 234.2,
+        "response_time_min": 3.9,
+        "edge_count": 18,
+        "edge_ids": [
+          15311,
+          14394,
+          14398,
+          2306,
+          14396,
+          15774,
+          2304,
+          16912,
+          12252,
+          2320,
+          2321,
+          2318,
+          1766,
+          4051,
+          5485,
+          5478,
+          7455,
+          7454
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 423,
+          "area_m2": 14588569.0,
+          "area_km2": 14.589
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1472,
+          "area_m2": 71462475.8,
+          "area_km2": 71.462
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 2922,
+          "area_m2": 169722190.6,
+          "area_km2": 169.722
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 1978,
+        "network_best_facility_id": 1828,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 1828,
+        "best_name": "兰州安新大医院",
+        "travel_time_s": 223.5,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 58,
+      "reachable_node_count": 57,
+      "facility_total": 58,
+      "timing_ms": {
+        "incident_snap": 2.3,
+        "facility_lookup": 2.16,
+        "candidate_routing": 27.048,
+        "best_route": 14.823,
+        "isochrone": 79.577,
+        "total_api": 112.214
+      }
+    },
+    {
+      "label": "medical_east",
+      "incident_type": "medical",
+      "incident": {
+        "lon": 103.93,
+        "lat": 36.05
+      },
+      "incident_snap": {
+        "node_id": 5643818640,
+        "node_lon": 103.9296341,
+        "node_lat": 36.0492421,
+        "snap_distance_m": 90.3
+      },
+      "facility_statistics": {
+        "total": 58,
+        "mapped": 58,
+        "unmapped": 0,
+        "reachable": 57,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 1013,
+        "osm_type": "way",
+        "osm_id": "418043814",
+        "name": "兰州大学第一医院",
+        "category": "healthcare",
+        "subcategory": "hospital",
+        "lon": 103.9179183985219,
+        "lat": 36.041711899999996,
+        "node_id": 4016862212,
+        "facility_snap_distance_m": 64.7,
+        "straight_distance_m": 1425.1,
+        "response_time_s": 213.4,
+        "response_time_min": 3.56
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 1013,
+          "osm_type": "way",
+          "osm_id": "418043814",
+          "name": "兰州大学第一医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.9179183985219,
+          "lat": 36.041711899999996,
+          "node_id": 4016862212,
+          "facility_snap_distance_m": 64.7,
+          "straight_distance_m": 1425.1,
+          "response_time_s": 213.4,
+          "response_time_min": 3.56
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 1106,
+          "osm_type": "way",
+          "osm_id": "591205181",
+          "name": "兰州重离子医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.90928946042534,
+          "lat": 36.063096,
+          "node_id": 6565127872,
+          "facility_snap_distance_m": 414.6,
+          "straight_distance_m": 2365.1,
+          "response_time_s": 350.6,
+          "response_time_min": 5.84
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 1148,
+          "osm_type": "way",
+          "osm_id": "700358891",
+          "name": "兰州军区空军机关医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.89163820912133,
+          "lat": 36.03750705,
+          "node_id": 4165362068,
+          "facility_snap_distance_m": 113.3,
+          "straight_distance_m": 3724.5,
+          "response_time_s": 374.8,
+          "response_time_min": 6.25
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 2178.3,
+        "response_time_s": 213.4,
+        "response_time_min": 3.56,
+        "edge_count": 15,
+        "edge_ids": [
+          3944,
+          4227,
+          244,
+          247,
+          9866,
+          9870,
+          17799,
+          15451,
+          12457,
+          3966,
+          11087,
+          12458,
+          85,
+          261,
+          12466
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 311,
+          "area_m2": 14130487.9,
+          "area_km2": 14.13
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1461,
+          "area_m2": 66127865.6,
+          "area_km2": 66.128
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 3037,
+          "area_m2": 153666563.1,
+          "area_km2": 153.667
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 1013,
+        "network_best_facility_id": 1013,
+        "straight_nearest_is_network_best": true
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 1013,
+        "best_name": "兰州大学第一医院",
+        "travel_time_s": 185.9,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 58,
+      "reachable_node_count": 57,
+      "facility_total": 58,
+      "timing_ms": {
+        "incident_snap": 2.105,
+        "facility_lookup": 2.097,
+        "candidate_routing": 26.707,
+        "best_route": 12.809,
+        "isochrone": 63.092,
+        "total_api": 123.642
+      }
+    },
+    {
+      "label": "medical_north_edge",
+      "incident_type": "medical",
+      "incident": {
+        "lon": 103.75,
+        "lat": 36.13
+      },
+      "incident_snap": {
+        "node_id": 13088607498,
+        "node_lon": 103.7463653,
+        "node_lat": 36.1311519,
+        "snap_distance_m": 351.3
+      },
+      "facility_statistics": {
+        "total": 58,
+        "mapped": 58,
+        "unmapped": 0,
+        "reachable": 57,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 2017,
+        "osm_type": "way",
+        "osm_id": "1446233095",
+        "name": "安宁区人民医院",
+        "category": "healthcare",
+        "subcategory": "hospital",
+        "lon": 103.7406464394785,
+        "lat": 36.09420385,
+        "node_id": 4339608702,
+        "facility_snap_distance_m": 112.9,
+        "straight_distance_m": 4060.3,
+        "response_time_s": 624.3,
+        "response_time_min": 10.4
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 2017,
+          "osm_type": "way",
+          "osm_id": "1446233095",
+          "name": "安宁区人民医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.7406464394785,
+          "lat": 36.09420385,
+          "node_id": 4339608702,
+          "facility_snap_distance_m": 112.9,
+          "straight_distance_m": 4060.3,
+          "response_time_s": 624.3,
+          "response_time_min": 10.4
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 1947,
+          "osm_type": "way",
+          "osm_id": "695044028",
+          "name": "兰州军区总医院（安宁分院）",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.73148531807209,
+          "lat": 36.102855149999996,
+          "node_id": 13376118600,
+          "facility_snap_distance_m": 154.5,
+          "straight_distance_m": 3442.5,
+          "response_time_s": 655.3,
+          "response_time_min": 10.92
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 1955,
+          "osm_type": "way",
+          "osm_id": "721020611",
+          "name": "万里医院",
+          "category": "healthcare",
+          "subcategory": "hospital",
+          "lon": 103.7182029,
+          "lat": 36.10978075,
+          "node_id": 4156183315,
+          "facility_snap_distance_m": 80.6,
+          "straight_distance_m": 3637.0,
+          "response_time_s": 666.6,
+          "response_time_min": 11.11
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 5146.4,
+        "response_time_s": 624.3,
+        "response_time_min": 10.4,
+        "edge_count": 9,
+        "edge_ids": [
+          10003,
+          10004,
+          1830,
+          4279,
+          1825,
+          6738,
+          1826,
+          6103,
+          6156
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 361,
+          "area_m2": 8738681.0,
+          "area_km2": 8.739
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1322,
+          "area_m2": 46256112.0,
+          "area_km2": 46.256
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 3444,
+          "area_m2": 143088650.6,
+          "area_km2": 143.089
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 1947,
+        "network_best_facility_id": 2017,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 1955,
+        "best_name": "万里医院",
+        "travel_time_s": 622.0,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 58,
+      "reachable_node_count": 57,
+      "facility_total": 58,
+      "timing_ms": {
+        "incident_snap": 2.034,
+        "facility_lookup": 2.072,
+        "candidate_routing": 41.073,
+        "best_route": 15.978,
+        "isochrone": 80.533,
+        "total_api": 138.567
+      }
+    },
+    {
+      "label": "fire_center",
+      "incident_type": "fire",
+      "incident": {
+        "lon": 103.8343,
+        "lat": 36.0611
+      },
+      "incident_snap": {
+        "node_id": 4077238566,
+        "node_lon": 103.8333381,
+        "node_lat": 36.0593936,
+        "snap_distance_m": 208.2
+      },
+      "facility_statistics": {
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "reachable": 3,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 2025,
+        "osm_type": "node",
+        "osm_id": "4174782122",
+        "name": "七里河消防队",
+        "category": "emergency",
+        "subcategory": "fire_station",
+        "lon": 103.7679478,
+        "lat": 36.072784,
+        "node_id": 1679819204,
+        "facility_snap_distance_m": 110.4,
+        "straight_distance_m": 6116.5,
+        "response_time_s": 519.7,
+        "response_time_min": 8.66
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 2025,
+          "osm_type": "node",
+          "osm_id": "4174782122",
+          "name": "七里河消防队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7679478,
+          "lat": 36.072784,
+          "node_id": 1679819204,
+          "facility_snap_distance_m": 110.4,
+          "straight_distance_m": 6116.5,
+          "response_time_s": 519.7,
+          "response_time_min": 8.66
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 2267,
+          "osm_type": "way",
+          "osm_id": "695044038",
+          "name": "兰州市南北两山消防中队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.77538594563097,
+          "lat": 36.083781,
+          "node_id": 4492223632,
+          "facility_snap_distance_m": 130.8,
+          "straight_distance_m": 5873.5,
+          "response_time_s": 778.7,
+          "response_time_min": 12.98
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 45,
+          "osm_type": "node",
+          "osm_id": "8555326932",
+          "name": null,
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7218809,
+          "lat": 36.053178,
+          "node_id": 4332089761,
+          "facility_snap_distance_m": 92.2,
+          "straight_distance_m": 10166.9,
+          "response_time_s": 907.8,
+          "response_time_min": 15.13
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 6966.3,
+        "response_time_s": 519.7,
+        "response_time_min": 8.66,
+        "edge_count": 42,
+        "edge_ids": [
+          662,
+          661,
+          9782,
+          652,
+          648,
+          3987,
+          10732,
+          14303,
+          4034,
+          18390,
+          4020,
+          13417,
+          4002,
+          5886,
+          18392,
+          822,
+          149,
+          811,
+          3738,
+          835,
+          1425,
+          13260,
+          1442,
+          1440,
+          9308,
+          9828,
+          9113,
+          2109,
+          2100,
+          1202,
+          13264,
+          487,
+          1237,
+          1222,
+          489,
+          1131,
+          1329,
+          1168,
+          1199,
+          3791,
+          3794,
+          3788
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 611,
+          "area_m2": 13496802.3,
+          "area_km2": 13.497
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2508,
+          "area_m2": 94094993.9,
+          "area_km2": 94.095
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4725,
+          "area_m2": 194534480.1,
+          "area_km2": 194.534
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 995,
+        "network_best_facility_id": 2025,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 2025,
+        "best_name": "七里河消防队",
+        "travel_time_s": 511.9,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 4,
+      "reachable_node_count": 3,
+      "facility_total": 4,
+      "timing_ms": {
+        "incident_snap": 2.234,
+        "facility_lookup": 1.621,
+        "candidate_routing": 9.823,
+        "best_route": 13.294,
+        "isochrone": 103.092,
+        "total_api": 140.386
+      }
+    },
+    {
+      "label": "fire_qilihe",
+      "incident_type": "fire",
+      "incident": {
+        "lon": 103.78,
+        "lat": 36.06
+      },
+      "incident_snap": {
+        "node_id": 11293237374,
+        "node_lon": 103.7801783,
+        "node_lat": 36.059145,
+        "snap_distance_m": 96.2
+      },
+      "facility_statistics": {
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "reachable": 3,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 2025,
+        "osm_type": "node",
+        "osm_id": "4174782122",
+        "name": "七里河消防队",
+        "category": "emergency",
+        "subcategory": "fire_station",
+        "lon": 103.7679478,
+        "lat": 36.072784,
+        "node_id": 1679819204,
+        "facility_snap_distance_m": 110.4,
+        "straight_distance_m": 1786.4,
+        "response_time_s": 266.7,
+        "response_time_min": 4.44
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 2025,
+          "osm_type": "node",
+          "osm_id": "4174782122",
+          "name": "七里河消防队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7679478,
+          "lat": 36.072784,
+          "node_id": 1679819204,
+          "facility_snap_distance_m": 110.4,
+          "straight_distance_m": 1786.4,
+          "response_time_s": 266.7,
+          "response_time_min": 4.44
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 45,
+          "osm_type": "node",
+          "osm_id": "8555326932",
+          "name": null,
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7218809,
+          "lat": 36.053178,
+          "node_id": 4332089761,
+          "facility_snap_distance_m": 92.2,
+          "straight_distance_m": 5290.9,
+          "response_time_s": 506.5,
+          "response_time_min": 8.44
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 2267,
+          "osm_type": "way",
+          "osm_id": "695044038",
+          "name": "兰州市南北两山消防中队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.77538594563097,
+          "lat": 36.083781,
+          "node_id": 4492223632,
+          "facility_snap_distance_m": 130.8,
+          "straight_distance_m": 2671.3,
+          "response_time_s": 594.1,
+          "response_time_min": 9.9
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 3547.9,
+        "response_time_s": 266.7,
+        "response_time_min": 4.44,
+        "edge_count": 22,
+        "edge_ids": [
+          665,
+          11553,
+          136,
+          4342,
+          11551,
+          15586,
+          655,
+          3984,
+          3991,
+          4013,
+          4015,
+          3983,
+          4000,
+          15562,
+          4025,
+          11804,
+          11799,
+          4017,
+          507,
+          2240,
+          2251,
+          2233
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 611,
+          "area_m2": 13496802.3,
+          "area_km2": 13.497
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2508,
+          "area_m2": 94094993.9,
+          "area_km2": 94.095
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4725,
+          "area_m2": 194534480.1,
+          "area_km2": 194.534
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 2025,
+        "network_best_facility_id": 2025,
+        "straight_nearest_is_network_best": true
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 2025,
+        "best_name": "七里河消防队",
+        "travel_time_s": 241.1,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 4,
+      "reachable_node_count": 3,
+      "facility_total": 4,
+      "timing_ms": {
+        "incident_snap": 2.196,
+        "facility_lookup": 1.776,
+        "candidate_routing": 9.784,
+        "best_route": 13.478,
+        "isochrone": 102.379,
+        "total_api": 134.235
+      }
+    },
+    {
+      "label": "fire_west",
+      "incident_type": "fire",
+      "incident": {
+        "lon": 103.68,
+        "lat": 36.09
+      },
+      "incident_snap": {
+        "node_id": 5636152833,
+        "node_lon": 103.6787322,
+        "node_lat": 36.0921946,
+        "snap_distance_m": 269.0
+      },
+      "facility_statistics": {
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "reachable": 3,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 45,
+        "osm_type": "node",
+        "osm_id": "8555326932",
+        "name": null,
+        "category": "emergency",
+        "subcategory": "fire_station",
+        "lon": 103.7218809,
+        "lat": 36.053178,
+        "node_id": 4332089761,
+        "facility_snap_distance_m": 92.2,
+        "straight_distance_m": 5561.2,
+        "response_time_s": 612.9,
+        "response_time_min": 10.21
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 45,
+          "osm_type": "node",
+          "osm_id": "8555326932",
+          "name": null,
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7218809,
+          "lat": 36.053178,
+          "node_id": 4332089761,
+          "facility_snap_distance_m": 92.2,
+          "straight_distance_m": 5561.2,
+          "response_time_s": 612.9,
+          "response_time_min": 10.21
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 2025,
+          "osm_type": "node",
+          "osm_id": "4174782122",
+          "name": "七里河消防队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7679478,
+          "lat": 36.072784,
+          "node_id": 1679819204,
+          "facility_snap_distance_m": 110.4,
+          "straight_distance_m": 8148.6,
+          "response_time_s": 706.2,
+          "response_time_min": 11.77
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 2267,
+          "osm_type": "way",
+          "osm_id": "695044038",
+          "name": "兰州市南北两山消防中队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.77538594563097,
+          "lat": 36.083781,
+          "node_id": 4492223632,
+          "facility_snap_distance_m": 130.8,
+          "straight_distance_m": 8618.6,
+          "response_time_s": 852.6,
+          "response_time_min": 14.21
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 7615.9,
+        "response_time_s": 612.9,
+        "response_time_min": 10.21,
+        "edge_count": 26,
+        "edge_ids": [
+          9941,
+          6811,
+          6821,
+          6823,
+          11577,
+          6826,
+          6836,
+          2901,
+          2904,
+          15308,
+          9736,
+          9740,
+          15298,
+          15300,
+          7943,
+          2266,
+          7959,
+          28,
+          3825,
+          12415,
+          5726,
+          14302,
+          17789,
+          14174,
+          14175,
+          14177
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 264,
+          "area_m2": 9953547.3,
+          "area_km2": 9.954
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1340,
+          "area_m2": 47498720.2,
+          "area_km2": 47.499
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 3087,
+          "area_m2": 166521692.6,
+          "area_km2": 166.522
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 45,
+        "network_best_facility_id": 45,
+        "straight_nearest_is_network_best": true
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 45,
+        "best_name": null,
+        "travel_time_s": 584.3,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 4,
+      "reachable_node_count": 3,
+      "facility_total": 4,
+      "timing_ms": {
+        "incident_snap": 1.959,
+        "facility_lookup": 1.61,
+        "candidate_routing": 9.419,
+        "best_route": 13.909,
+        "isochrone": 70.819,
+        "total_api": 108.732
+      }
+    },
+    {
+      "label": "fire_east",
+      "incident_type": "fire",
+      "incident": {
+        "lon": 103.93,
+        "lat": 36.05
+      },
+      "incident_snap": {
+        "node_id": 5643818640,
+        "node_lon": 103.9296341,
+        "node_lat": 36.0492421,
+        "snap_distance_m": 90.3
+      },
+      "facility_statistics": {
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "reachable": 3,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 2025,
+        "osm_type": "node",
+        "osm_id": "4174782122",
+        "name": "七里河消防队",
+        "category": "emergency",
+        "subcategory": "fire_station",
+        "lon": 103.7679478,
+        "lat": 36.072784,
+        "node_id": 1679819204,
+        "facility_snap_distance_m": 110.4,
+        "straight_distance_m": 14817.2,
+        "response_time_s": 1292.5,
+        "response_time_min": 21.54
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 2025,
+          "osm_type": "node",
+          "osm_id": "4174782122",
+          "name": "七里河消防队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7679478,
+          "lat": 36.072784,
+          "node_id": 1679819204,
+          "facility_snap_distance_m": 110.4,
+          "straight_distance_m": 14817.2,
+          "response_time_s": 1292.5,
+          "response_time_min": 21.54
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 2267,
+          "osm_type": "way",
+          "osm_id": "695044038",
+          "name": "兰州市南北两山消防中队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.77538594563097,
+          "lat": 36.083781,
+          "node_id": 4492223632,
+          "facility_snap_distance_m": 130.8,
+          "straight_distance_m": 14424.3,
+          "response_time_s": 1534.8,
+          "response_time_min": 25.58
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 45,
+          "osm_type": "node",
+          "osm_id": "8555326932",
+          "name": null,
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7218809,
+          "lat": 36.053178,
+          "node_id": 4332089761,
+          "facility_snap_distance_m": 92.2,
+          "straight_distance_m": 18755.9,
+          "response_time_s": 1680.6,
+          "response_time_min": 28.01
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 16853.8,
+        "response_time_s": 1292.5,
+        "response_time_min": 21.54,
+        "edge_count": 101,
+        "edge_ids": [
+          662,
+          661,
+          9782,
+          652,
+          648,
+          3987,
+          10732,
+          14303,
+          4034,
+          18390,
+          4020,
+          13417,
+          4002,
+          5886,
+          18392,
+          822,
+          149,
+          811,
+          3738,
+          835,
+          1425,
+          13260,
+          1443,
+          3237,
+          1427,
+          2120,
+          2091,
+          1386,
+          250,
+          3175,
+          1388,
+          804,
+          1198,
+          2923,
+          1260,
+          14365,
+          1205,
+          1266,
+          10378,
+          10374,
+          32,
+          1098,
+          1295,
+          1278,
+          4333,
+          36,
+          4250,
+          4217,
+          37,
+          1211,
+          1213,
+          51,
+          17011,
+          4379,
+          4348,
+          4148,
+          4203,
+          3220,
+          781,
+          4131,
+          4420,
+          4269,
+          4165,
+          177,
+          117,
+          11449,
+          4285,
+          1571,
+          1598,
+          1669,
+          39,
+          369,
+          18230,
+          943,
+          366,
+          7842,
+          8460,
+          12578,
+          3331,
+          2205,
+          1140,
+          3368,
+          362,
+          3375,
+          3377,
+          3350,
+          1966,
+          9687,
+          244,
+          247,
+          9866,
+          9870,
+          17799,
+          15451,
+          12457,
+          3966,
+          11087,
+          12458,
+          85,
+          261,
+          12466
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 611,
+          "area_m2": 13496802.3,
+          "area_km2": 13.497
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2508,
+          "area_m2": 94094993.9,
+          "area_km2": 94.095
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4725,
+          "area_m2": 194534480.1,
+          "area_km2": 194.534
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 995,
+        "network_best_facility_id": 2025,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 2025,
+        "best_name": "七里河消防队",
+        "travel_time_s": 1251.7,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 4,
+      "reachable_node_count": 3,
+      "facility_total": 4,
+      "timing_ms": {
+        "incident_snap": 2.031,
+        "facility_lookup": 1.695,
+        "candidate_routing": 10.466,
+        "best_route": 14.633,
+        "isochrone": 101.483,
+        "total_api": 136.623
+      }
+    },
+    {
+      "label": "fire_north_edge",
+      "incident_type": "fire",
+      "incident": {
+        "lon": 103.75,
+        "lat": 36.13
+      },
+      "incident_snap": {
+        "node_id": 13088607498,
+        "node_lon": 103.7463653,
+        "node_lat": 36.1311519,
+        "snap_distance_m": 351.3
+      },
+      "facility_statistics": {
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "reachable": 3,
+        "unreachable": 1,
+        "returned": 3
+      },
+      "recommended": {
+        "network_rank": 1,
+        "poi_id": 2025,
+        "osm_type": "node",
+        "osm_id": "4174782122",
+        "name": "七里河消防队",
+        "category": "emergency",
+        "subcategory": "fire_station",
+        "lon": 103.7679478,
+        "lat": 36.072784,
+        "node_id": 1679819204,
+        "facility_snap_distance_m": 110.4,
+        "straight_distance_m": 6551.2,
+        "response_time_s": 932.6,
+        "response_time_min": 15.54
+      },
+      "candidates": [
+        {
+          "network_rank": 1,
+          "poi_id": 2025,
+          "osm_type": "node",
+          "osm_id": "4174782122",
+          "name": "七里河消防队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7679478,
+          "lat": 36.072784,
+          "node_id": 1679819204,
+          "facility_snap_distance_m": 110.4,
+          "straight_distance_m": 6551.2,
+          "response_time_s": 932.6,
+          "response_time_min": 15.54
+        },
+        {
+          "network_rank": 2,
+          "poi_id": 2267,
+          "osm_type": "way",
+          "osm_id": "695044038",
+          "name": "兰州市南北两山消防中队",
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.77538594563097,
+          "lat": 36.083781,
+          "node_id": 4492223632,
+          "facility_snap_distance_m": 130.8,
+          "straight_distance_m": 5614.8,
+          "response_time_s": 968.5,
+          "response_time_min": 16.14
+        },
+        {
+          "network_rank": 3,
+          "poi_id": 45,
+          "osm_type": "node",
+          "osm_id": "8555326932",
+          "name": null,
+          "category": "emergency",
+          "subcategory": "fire_station",
+          "lon": 103.7218809,
+          "lat": 36.053178,
+          "node_id": 4332089761,
+          "facility_snap_distance_m": 92.2,
+          "straight_distance_m": 8892.4,
+          "response_time_s": 1399.8,
+          "response_time_min": 23.33
+        }
+      ],
+      "response_route": {
+        "network_distance_m": 8565.8,
+        "response_time_s": 932.6,
+        "response_time_min": 15.54,
+        "edge_count": 31,
+        "edge_ids": [
+          665,
+          11553,
+          135,
+          140,
+          17049,
+          142,
+          153,
+          5276,
+          5284,
+          16686,
+          1731,
+          2336,
+          9059,
+          2329,
+          8216,
+          8221,
+          1689,
+          10402,
+          3496,
+          16959,
+          16956,
+          9165,
+          9171,
+          3493,
+          16266,
+          9192,
+          1825,
+          6738,
+          1826,
+          6103,
+          6156
+        ],
+        "routing_direction": "facility_to_incident"
+      },
+      "isochrone_bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 611,
+          "area_m2": 13496802.3,
+          "area_km2": 13.497
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2508,
+          "area_m2": 94094993.9,
+          "area_km2": 94.095
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4725,
+          "area_m2": 194534480.1,
+          "area_km2": 194.534
+        }
+      ],
+      "straight_comparison": {
+        "straight_nearest_facility_id": 2267,
+        "network_best_facility_id": 2025,
+        "straight_nearest_is_network_best": false
+      },
+      "phase5_incident_to_facility": {
+        "best_poi_id": 2025,
+        "best_name": "七里河消防队",
+        "travel_time_s": 934.0,
+        "differs_from_phase7_facility_to_incident": true
+      },
+      "source_node_count": 4,
+      "reachable_node_count": 3,
+      "facility_total": 4,
+      "timing_ms": {
+        "incident_snap": 2.238,
+        "facility_lookup": 1.642,
+        "candidate_routing": 10.677,
+        "best_route": 13.434,
+        "isochrone": 95.872,
+        "total_api": 156.787
+      }
+    }
+  ],
+  "summary_ms": {
+    "incident_snap": {
+      "average": 2.165,
+      "minimum": 1.959,
+      "maximum": 2.381
+    },
+    "facility_lookup": {
+      "average": 1.9,
+      "minimum": 1.61,
+      "maximum": 2.19
+    },
+    "candidate_routing": {
+      "average": 18.039,
+      "minimum": 9.419,
+      "maximum": 41.073
+    },
+    "best_route": {
+      "average": 14.212,
+      "minimum": 12.809,
+      "maximum": 15.978
+    },
+    "isochrone": {
+      "average": 92.581,
+      "minimum": 63.092,
+      "maximum": 114.546
+    },
+    "total_api": {
+      "average": 135.451,
+      "minimum": 108.732,
+      "maximum": 156.787
+    }
+  },
+  "one_way_validation": {
+    "id": 13266,
+    "osm_id": "420345709",
+    "name": "南滨河东路",
+    "source": 6528742291,
+    "target": 6528742285,
+    "cost": 0.15914965112557403,
+    "reverse_cost": -1.0,
+    "forward_uses_edge": true,
+    "reverse_uses_forbidden_edge": false,
+    "reverse_route_edge_count": 3
+  },
+  "explain": {
+    "incident_snap": [
+      "Limit  (cost=21.06..21.06 rows=1 width=16) (actual time=0.118..0.118 rows=1 loops=1)",
+      "  Buffers: shared hit=35",
+      "  ->  Sort  (cost=21.06..21.06 rows=1 width=16) (actual time=0.117..0.117 rows=1 loops=1)",
+      "        Sort Key: (((n.geometry)::geography <-> '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography)), n.osm_node_id",
+      "        Sort Method: top-N heapsort  Memory: 25kB",
+      "        Buffers: shared hit=35",
+      "        ->  Index Scan using idx_road_nodes_geography on road_nodes n  (cost=0.28..21.05 rows=1 width=16) (actual time=0.024..0.113 rows=25 loops=1)",
+      "              Index Cond: ((geometry)::geography && _st_expand('0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision))",
+      "              Filter: st_dwithin((geometry)::geography, '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision, true)",
+      "              Rows Removed by Filter: 39",
+      "              Buffers: shared hit=35",
+      "Planning Time: 0.068 ms",
+      "Execution Time: 0.126 ms"
+    ],
+    "facility_lookup": [
+      "Sort  (cost=22.30..22.31 rows=1 width=24) (actual time=0.070..0.072 rows=58 loops=1)",
+      "  Sort Key: p.id",
+      "  Sort Method: quicksort  Memory: 27kB",
+      "  Buffers: shared hit=28",
+      "  ->  Hash Join  (cost=19.95..22.29 rows=1 width=24) (actual time=0.049..0.064 rows=58 loops=1)",
+      "        Hash Cond: (access.poi_id = p.id)",
+      "        Buffers: shared hit=28",
+      "        ->  Seq Scan on poi_routing_access access  (cost=0.00..2.06 rows=106 width=24) (actual time=0.002..0.006 rows=106 loops=1)",
+      "              Buffers: shared hit=1",
+      "        ->  Hash  (cost=19.92..19.92 rows=3 width=8) (actual time=0.043..0.044 rows=58 loops=1)",
+      "              Buckets: 1024  Batches: 1  Memory Usage: 11kB",
+      "              Buffers: shared hit=27",
+      "              ->  Bitmap Heap Scan on pois p  (cost=10.01..19.92 rows=3 width=8) (actual time=0.015..0.037 rows=58 loops=1)",
+      "                    Recheck Cond: (((subcategory)::text = 'hospital'::text) AND ((category)::text = 'healthcare'::text))",
+      "                    Heap Blocks: exact=23",
+      "                    Buffers: shared hit=27",
+      "                    ->  BitmapAnd  (cost=10.01..10.01 rows=3 width=0) (actual time=0.011..0.012 rows=0 loops=1)",
+      "                          Buffers: shared hit=4",
+      "                          ->  Bitmap Index Scan on ix_pois_subcategory  (cost=0.00..4.71 rows=58 width=0) (actual time=0.005..0.005 rows=58 loops=1)",
+      "                                Index Cond: ((subcategory)::text = 'hospital'::text)",
+      "                                Buffers: shared hit=2",
+      "                          ->  Bitmap Index Scan on ix_pois_category  (cost=0.00..5.04 rows=102 width=0) (actual time=0.005..0.005 rows=102 loops=1)",
+      "                                Index Cond: ((category)::text = 'healthcare'::text)",
+      "                                Buffers: shared hit=2",
+      "Planning:",
+      "  Buffers: shared hit=7",
+      "Planning Time: 0.080 ms",
+      "Execution Time: 0.085 ms"
+    ],
+    "candidate_many_to_one": [
+      "Function Scan on pgr_dijkstracost  (cost=0.25..10.25 rows=1000 width=24) (actual time=14.822..14.823 rows=57 loops=1)",
+      "  Buffers: shared hit=912",
+      "Planning Time: 0.007 ms",
+      "Execution Time: 14.829 ms"
+    ]
+  }
+}
