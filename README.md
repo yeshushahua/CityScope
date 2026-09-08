@@ -4,7 +4,7 @@
 
 **Current Status: Phase 5 - Completed**
 
-CityScope 是以兰州市连续主城区及周边建成区为示范区域的 WebGIS 求职作品。当前已建立真实数据与基础空间查询链：
+CityScope 是以兰州市连续主城区及周边建成区为示范区域的 WebGIS 作品。当前已建立真实数据与基础空间查询链：
 
 ```text
 OpenStreetMap → OSMnx 有向路网 ETL → PostGIS + pgRouting → FastAPI → MapLibre
