@@ -98,7 +98,7 @@ button { font: inherit; }
 .phase-label { margin-top: auto; padding: 10px 8px 0; }
 
 .routing-panel { display: flex; flex-direction: column; gap: 10px; margin: 14px 5px 0; }
-.routing-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; background: #e8eeeb; border-radius: 8px; }
+.routing-mode { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 3px; background: #e8eeeb; border-radius: 8px; }
 .routing-mode button { padding: 8px 4px; color: #64746f; background: transparent; border: 0; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 700; }
 .routing-mode button.is-active { color: #145e51; background: #fff; box-shadow: 0 1px 4px rgba(32, 60, 54, 0.12); }
 .facility-selector { display: flex; flex-direction: column; gap: 6px; color: #74847f; font-size: 9px; font-weight: 750; letter-spacing: 0.06em; }
@@ -118,6 +118,17 @@ button { font: inherit; }
 .route-metrics span { color: #7d8a87; font-size: 8px; }
 .route-metrics strong { color: #174d43; font: 750 11px/1.2 ui-monospace, Consolas, monospace; }
 .facility-results { display: flex; flex-direction: column; gap: 7px; }
+.isochrone-results { display: flex; flex-direction: column; gap: 7px; }
+.isochrone-snap { display: flex; align-items: center; justify-content: space-between; padding: 8px 9px; color: #667772; background: #fff; border: 1px solid #e1e7e4; border-radius: 7px; font-size: 9px; }
+.isochrone-snap strong { color: #174d43; font: 750 11px/1.2 ui-monospace, Consolas, monospace; }
+.isochrone-band-list { display: grid; gap: 5px; }
+.isochrone-band { display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 6px; padding: 9px; background: #fff; border: 1px solid #e1e7e4; border-left: 4px solid #4b76c5; border-radius: 7px; }
+.isochrone-band.is-10 { border-left-color: #2a9d8f; }
+.isochrone-band.is-5 { border-left-color: #f2a93b; }
+.isochrone-band strong { color: #314a44; font-size: 10px; }
+.isochrone-band span { color: #788883; font-size: 9px; }
+.isochrone-band b { color: #174d43; font: 750 10px/1.2 ui-monospace, Consolas, monospace; }
+.isochrone-note { margin: 0; color: #778681; font-size: 8px; line-height: 1.45; }
 .facility-best { display: flex; flex-direction: column; gap: 3px; padding: 10px; color: #174d43; background: #fff6ec; border: 1px solid #ecd9bd; border-radius: 7px; }
 .facility-best span { color: #9b6a2d; font-size: 8px; font-weight: 800; letter-spacing: 0.08em; }
 .facility-best strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }

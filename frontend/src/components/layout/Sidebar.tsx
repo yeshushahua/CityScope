@@ -9,6 +9,7 @@ import SpatialQueryPanel from '../spatial/SpatialQueryPanel'
 import RoutingPanel from '../routing/RoutingPanel'
 import type {
   FacilityPreset,
+  IsochroneResponse,
   NearestFacilityResponse,
   RoutingMode,
   RoutingStatus,
@@ -41,6 +42,7 @@ interface SidebarProps {
   facilityPreset: FacilityPreset
   shortestResult: ShortestPathResponse | null
   nearestResult: NearestFacilityResponse | null
+  isochroneResult: IsochroneResponse | null
   onRoutingModeChange: (mode: RoutingMode) => void
   onFacilityPresetChange: (preset: FacilityPreset) => void
   onClearRouting: () => void
@@ -50,7 +52,7 @@ interface SidebarProps {
 const MODULES: ReadonlyArray<{ id: ModuleId; label: string; description: string }> = [
   { id: 'overview', label: '城市总览', description: '浏览兰州市基础地图' },
   { id: 'spatial', label: '空间查询', description: '按点击位置执行 PostGIS 范围查询' },
-  { id: 'routing', label: '路径规划', description: '计算最短时间路径与最快可达设施' },
+  { id: 'routing', label: '路径规划', description: '计算最短路径、最快设施与道路时间可达圈' },
   { id: 'emergency', label: '应急响应', description: '功能将在后续阶段开放' },
   { id: 'accessibility', label: '可达性分析', description: '功能将在后续阶段开放' },
 ]
@@ -78,6 +80,7 @@ export default function Sidebar({
   facilityPreset,
   shortestResult,
   nearestResult,
+  isochroneResult,
   onRoutingModeChange,
   onFacilityPresetChange,
   onClearRouting,
@@ -151,6 +154,7 @@ export default function Sidebar({
           facilityPreset={facilityPreset}
           shortestResult={shortestResult}
           nearestResult={nearestResult}
+          isochroneResult={isochroneResult}
           onModeChange={onRoutingModeChange}
           onFacilityPresetChange={onFacilityPresetChange}
           onClear={onClearRouting}
@@ -166,7 +170,7 @@ export default function Sidebar({
         <strong>{activeItem.label}</strong>
         <span>{activeItem.description}</span>
       </div>}
-      <div className="phase-label">PHASE 5 · ROUTING APPLICATION</div>
+      <div className="phase-label">PHASE 6 · NETWORK ISOCHRONE</div>
     </aside>
   )
 }

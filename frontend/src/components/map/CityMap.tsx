@@ -21,7 +21,7 @@ import {
 import type { MapCoordinatesValue, MapLoadStatus } from '../../types/map'
 import type { LayerCounts, PoiProperties, RoadProperties } from '../../types/geojson'
 import type { FocusPoint, NearbyPoiCollection, QueryCenter } from '../../types/spatial'
-import type { NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../types/routing'
+import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../types/routing'
 import { fetchBuildings, fetchNetworkEdges, fetchPois } from '../../services/api'
 import MapCoordinates from './MapCoordinates'
 import MapStatus from './MapStatus'
@@ -50,6 +50,11 @@ import {
   setRoutingData,
   setRoutingVisibility,
 } from './layers/routingResultLayer'
+import {
+  addIsochroneLayers,
+  setIsochroneData,
+  setIsochroneVisibility,
+} from './layers/isochroneLayer'
 
 setWorkerUrl(workerUrl)
 
@@ -186,6 +191,7 @@ interface CityMapProps {
   routeEnd: QueryCenter | null
   shortestResult: ShortestPathResponse | null
   nearestResult: NearestFacilityResponse | null
+  isochroneResult: IsochroneResponse | null
   onSelectRoutingPoint: (point: QueryCenter) => void
 }
 
@@ -204,6 +210,7 @@ export default function CityMap({
   routeEnd,
   shortestResult,
   nearestResult,
+  isochroneResult,
   onSelectRoutingPoint,
 }: CityMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -226,6 +233,7 @@ export default function CityMap({
   const routeEndRef = useRef(routeEnd)
   const shortestResultRef = useRef(shortestResult)
   const nearestResultRef = useRef(nearestResult)
+  const isochroneResultRef = useRef(isochroneResult)
   const selectRoutingPointRef = useRef(onSelectRoutingPoint)
   const [coordinates, setCoordinates] = useState<MapCoordinatesValue | null>(null)
   const [loadStatus, setLoadStatus] = useState<MapLoadStatus>('loading')
@@ -274,13 +282,16 @@ export default function CityMap({
     routeEndRef.current = routeEnd
     shortestResultRef.current = shortestResult
     nearestResultRef.current = nearestResult
+    isochroneResultRef.current = isochroneResult
     selectRoutingPointRef.current = onSelectRoutingPoint
     const map = mapRef.current
     if (!map || !map.loaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive)
     setRoutingVisibility(map, routingModeActive)
-    setRoutingData(map, routingMode, routeStart, routeEnd, shortestResult, nearestResult)
-  }, [routingModeActive, routingMode, routeStart, routeEnd, shortestResult, nearestResult, onSelectRoutingPoint])
+    setIsochroneVisibility(map, routingModeActive && routingMode === 'isochrone')
+    setIsochroneData(map, isochroneResult)
+    setRoutingData(map, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult)
+  }, [routingModeActive, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult, onSelectRoutingPoint])
 
   useEffect(() => {
     if (!focusPoint) return
@@ -385,6 +396,7 @@ export default function CityMap({
       addBuildingLayer(map, layersRef.current.buildings)
       addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current)
       addSpatialQueryLayers(map, spatialModeRef.current)
+      addIsochroneLayers(map, routingModeActiveRef.current && routingModeRef.current === 'isochrone')
       addRoutingLayers(map, routingModeActiveRef.current)
       setSpatialQueryData(
         map,
@@ -399,7 +411,9 @@ export default function CityMap({
         routeEndRef.current,
         shortestResultRef.current,
         nearestResultRef.current,
+        isochroneResultRef.current,
       )
+      setIsochroneData(map, isochroneResultRef.current)
       map.on('click', POI_LAYER_ID, handlePoiClick)
       map.on('mouseenter', POI_LAYER_ID, () => { map.getCanvas().style.cursor = 'pointer' })
       map.on('mouseleave', POI_LAYER_ID, () => { map.getCanvas().style.cursor = '' })

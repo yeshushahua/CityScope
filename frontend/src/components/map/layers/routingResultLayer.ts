@@ -1,7 +1,7 @@
 import type { Feature, FeatureCollection, LineString, Point } from 'geojson'
 import type { GeoJSONSource, Map } from 'maplibre-gl'
 import type { QueryCenter } from '../../../types/spatial'
-import type { NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../../types/routing'
+import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../../types/routing'
 
 export const ROUTING_SOURCE_ID = 'cityscope-routing'
 export const ROUTE_LINE_LAYER_ID = 'cityscope-route-line'
@@ -46,10 +46,19 @@ function resultData(
   end: QueryCenter | null,
   shortest: ShortestPathResponse | null,
   nearest: NearestFacilityResponse | null,
+  isochrone: IsochroneResponse | null,
 ): FeatureCollection<LineString | Point, RoutingProperties> {
   const features: Feature<LineString | Point, RoutingProperties>[] = []
   if (start) features.push(pointFeature(start, { kind: 'start', label: mode === 'nearest' ? '当前位置' : '起点' }))
   if (mode === 'shortest' && end) features.push(pointFeature(end, { kind: 'end', label: '终点' }))
+  if (mode === 'isochrone') {
+    if (isochrone) {
+      const snap = { lon: isochrone.snap.node_lon, lat: isochrone.snap.node_lat }
+      features.push(connector(isochrone.origin, snap))
+      features.push(pointFeature(snap, { kind: 'snap', label: '起点吸附节点' }))
+    }
+    return { type: 'FeatureCollection', features }
+  }
   const result = mode === 'shortest' ? shortest : nearest
   if (!result) return { type: 'FeatureCollection', features }
 
@@ -151,9 +160,10 @@ export function setRoutingData(
   end: QueryCenter | null,
   shortest: ShortestPathResponse | null,
   nearest: NearestFacilityResponse | null,
+  isochrone: IsochroneResponse | null,
 ): void {
   ;(map.getSource(ROUTING_SOURCE_ID) as GeoJSONSource | undefined)?.setData(
-    resultData(mode, start, end, shortest, nearest),
+    resultData(mode, start, end, shortest, nearest, isochrone),
   )
 }
 

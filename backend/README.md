@@ -15,7 +15,10 @@ FastAPI 服务通过 SQLAlchemy、GeoAlchemy2 和 Psycopg 连接 PostGIS。数�
 - `GET /api/v1/network/stats`
 - `POST /api/v1/routing/shortest-path`
 - `GET /api/v1/routing/nearest-facility`
+- `GET /api/v1/routing/isochrone`
 
 Phase 5 直接使用 `routing_edges` 的静态时间 cost，以 `directed => true` 调用 `pgr_dijkstra` / `pgr_dijkstraCost`。地图点通过 PostGIS 吸附至 500 m 内的道路节点；最近设施按网络时间选择并过滤不可达候选。
+
+Phase 6 对同一静态有向成本执行一次最大 900 秒的 `pgr_drivingDistance`，分离 300/600/900 秒可达顶点，并在 EPSG:32648 中生成合法且嵌套的服务区近似边界。结果固定为 5/10/15 分钟，不包含实时交通或 POI 覆盖统计。
 
 启动、ETL 与测试方法见项目根目录 README。

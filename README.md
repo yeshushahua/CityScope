@@ -2,7 +2,7 @@
 
 城市空间智能分析与应急响应平台
 
-**Current Status: Phase 5 - Completed**
+**Current Status: Phase 6 - Completed**
 
 CityScope 是以兰州市连续主城区及周边建成区为示范区域的 WebGIS 作品。当前已建立真实数据与基础空间查询链：
 
@@ -12,7 +12,7 @@ OpenStreetMap → OSMnx 有向路网 ETL → PostGIS + pgRouting → FastAPI →
 
 地图业务图层来自本地 PostGIS，不使用手写坐标或静态假数据。当前 Demo bbox 为 `(103.60, 35.98, 104.08, 36.16)`、CRS 为 EPSG:4326；它代表兰州市主城区示范研究区，不代表完整兰州市行政辖区。
 
-Phase 1–4 的地图、真实 PostGIS 数据、空间查询与 18,441 条有向道路边保持可用。Phase 5 增加 vertex snapping、基于 `travel_time_s` 的有向 Dijkstra 路径，以及按道路网络时间选择医院/消防站。路线 geometry 直接来自真实 `routing_edges`；预计时间基于静态道路速度（Estimated travel time based on static road speeds）。
+Phase 1–5 的地图、真实 PostGIS 数据、空间查询、18,441 条有向道路边、最短路径和最近设施保持可用。Phase 6 增加 5/10/15-minute road-network isochrones、pgRouting driving-distance analysis 和 PostGIS service-area geometry。范围基于 static travel-time model，并由可达道路顶点生成 vertex-based service-area approximation，不代表实时交通或连续道路位置的精确理论边界。
 
 ## 技术栈
 
@@ -102,6 +102,7 @@ npm run dev
 - `GET /api/v1/network/stats`
 - `POST /api/v1/routing/shortest-path`
 - `GET /api/v1/routing/nearest-facility?lon=...&lat=...&category=healthcare&subcategory=hospital&limit=5`
+- `GET /api/v1/routing/isochrone?lon=103.8343&lat=36.0611&max_snap_m=500`
 
 建筑接口强制要求小范围 bbox；空间过滤使用 PostGIS `ST_Intersects` 与 `ST_MakeEnvelope`。
 
@@ -115,14 +116,14 @@ npm run build
 npm run preview -- --host 127.0.0.1 --port 4173 --strictPort
 ```
 
-完整数据准备记录见 [Phase 2 验证文档](docs/phase-2-validation.md)，空间查询见 [Phase 3 验证文档](docs/phase-3-validation.md)，路网结构见 [Phase 4 验证文档](docs/phase-4-validation.md)，Dijkstra、最近设施、性能、EXPLAIN 与浏览器验收见 [Phase 5 验证文档](docs/phase-5-validation.md)。
+完整数据准备记录见 [Phase 2 验证文档](docs/phase-2-validation.md)，空间查询见 [Phase 3 验证文档](docs/phase-3-validation.md)，路网结构见 [Phase 4 验证文档](docs/phase-4-validation.md)，Dijkstra 与最近设施见 [Phase 5 验证文档](docs/phase-5-validation.md)，道路时间 Isochrone、性能、EXPLAIN 与浏览器验收见 [Phase 6 验证文档](docs/phase-6-validation.md)。
 
 ## 数据来源与限制
 
 业务空间数据来自 © OpenStreetMap contributors。底图 Attribution 保留 OpenFreeMap、OpenMapTiles 与 OpenStreetMap 链接。数据完整性受 OpenStreetMap 社区数据覆盖程度影响。
 
-静态速度是用于网络分析的估计值，不是实时交通速度或实时 ETA。当前路径使用顶点吸附，输入点到吸附节点的距离不计入道路路线；研究区的小连通分量和不可达设施会如实保留并报告。Isochrone、应急调度和 15 分钟生活圈属于后续阶段。
+静态速度是用于网络分析的估计值，不是实时交通速度或实时 ETA。路径和 Isochrone 使用顶点吸附，输入点到吸附节点的距离不计入道路成本。Isochrone 边界由可达道路节点的凹壳生成，是服务区近似边界；研究区的小连通分量和不可达设施会如实保留并报告。应急调度和 15 分钟生活圈指标属于后续阶段。
 
 ## 下一阶段
 
-Phase 6：5/10/15 分钟 Isochrone。
+Phase 7：应急响应业务。

@@ -8,7 +8,7 @@ from app.api.routing import router as routing_router
 from app.core.config import settings
 from app.schemas.health import RootResponse
 
-app = FastAPI(title="CityScope API", version="0.5.0")
+app = FastAPI(title="CityScope API", version="0.6.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,

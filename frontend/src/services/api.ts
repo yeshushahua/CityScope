@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { BuildingCollection, PoiCollection, RoadCollection } from '../types/geojson'
 import type { PoiCategory } from '../config/poiCategories'
 import type { NearbyPoiCollection, QueryCenter, SpatialSummary } from '../types/spatial'
-import type { FacilityPreset, NearestFacilityResponse, ShortestPathResponse } from '../types/routing'
+import type { FacilityPreset, IsochroneResponse, NearestFacilityResponse, ShortestPathResponse } from '../types/routing'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -110,6 +110,17 @@ export async function fetchNearestFacility(
       : { category: 'healthcare' }
   const { data } = await api.get<NearestFacilityResponse>('/api/v1/routing/nearest-facility', {
     params: { lon: origin.lon, lat: origin.lat, max_snap_m: 500, limit: 5, ...params },
+    signal,
+  })
+  return data
+}
+
+export async function fetchIsochrone(
+  origin: QueryCenter,
+  signal?: AbortSignal,
+): Promise<IsochroneResponse> {
+  const { data } = await api.get<IsochroneResponse>('/api/v1/routing/isochrone', {
+    params: { lon: origin.lon, lat: origin.lat, max_snap_m: 500 },
     signal,
   })
   return data

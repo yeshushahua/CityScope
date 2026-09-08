@@ -1,6 +1,6 @@
 import type { QueryCenter } from './spatial'
 
-export type RoutingMode = 'shortest' | 'nearest'
+export type RoutingMode = 'shortest' | 'nearest' | 'isochrone'
 export type RoutingStatus =
   | 'idle'
   | 'selecting_start'
@@ -74,5 +74,31 @@ export interface NearestFacilityResponse {
     reachable_count: number
     unreachable_count: number
     returned_count: number
+  }
+}
+
+export interface IsochroneProperties {
+  minutes: 5 | 10 | 15
+  threshold_s: 300 | 600 | 900
+  reachable_node_count: number
+  area_m2: number
+  area_km2: number
+}
+
+export interface IsochroneFeature {
+  type: 'Feature'
+  geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon
+  properties: IsochroneProperties
+}
+
+export interface IsochroneResponse {
+  origin: QueryCenter
+  snap: NetworkSnap
+  cost_model: 'static_travel_time'
+  directed: true
+  max_analysis_time_s: 900
+  isochrones: {
+    type: 'FeatureCollection'
+    features: IsochroneFeature[]
   }
 }

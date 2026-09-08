@@ -1,6 +1,7 @@
 import type { QueryCenter } from '../../types/spatial'
 import type {
   FacilityPreset,
+  IsochroneResponse,
   NearestFacilityResponse,
   RoutingMode,
   RoutingStatus,
@@ -15,6 +16,7 @@ interface RoutingPanelProps {
   facilityPreset: FacilityPreset
   shortestResult: ShortestPathResponse | null
   nearestResult: NearestFacilityResponse | null
+  isochroneResult: IsochroneResponse | null
   onModeChange: (mode: RoutingMode) => void
   onFacilityPresetChange: (preset: FacilityPreset) => void
   onClear: () => void
@@ -51,6 +53,7 @@ export default function RoutingPanel({
   facilityPreset,
   shortestResult,
   nearestResult,
+  isochroneResult,
   onModeChange,
   onFacilityPresetChange,
   onClear,
@@ -58,11 +61,23 @@ export default function RoutingPanel({
   onFocus,
 }: RoutingPanelProps) {
   const route = mode === 'shortest' ? shortestResult?.route : nearestResult?.route
+  const statusMessage = mode === 'isochrone'
+    ? status === 'loading'
+      ? '正在吸附路网并计算 5 / 10 / 15 分钟可达圈…'
+      : status === 'success'
+        ? '可达圈计算完成；再次点击地图可更新起点。'
+        : status === 'idle'
+          ? '结果已清除；点击地图可选择新起点。'
+          : status === 'error'
+            ? '可达圈服务暂时不可用，请重新选择。'
+            : MESSAGE[status]
+    : MESSAGE[status]
   return (
     <section className="routing-panel" aria-label="路径规划">
       <div className="routing-mode" role="group" aria-label="规划模式">
         <button className={mode === 'shortest' ? 'is-active' : ''} onClick={() => onModeChange('shortest')} type="button">点到点</button>
         <button className={mode === 'nearest' ? 'is-active' : ''} onClick={() => onModeChange('nearest')} type="button">最近设施</button>
+        <button className={mode === 'isochrone' ? 'is-active' : ''} onClick={() => onModeChange('isochrone')} type="button">可达圈</button>
       </div>
 
       {mode === 'nearest' && (
@@ -78,13 +93,13 @@ export default function RoutingPanel({
 
       <div className="routing-instruction">
         <span className="section-kicker">NETWORK ROUTING</span>
-        <strong>{mode === 'shortest' ? '依次点击起点和终点' : '点击位置查找最快可达设施'}</strong>
-        <span>按道路通行时间排序 · 最大吸附距离 500 m</span>
+        <strong>{mode === 'shortest' ? '依次点击起点和终点' : mode === 'nearest' ? '点击位置查找最快可达设施' : '点击位置计算道路时间可达圈'}</strong>
+        <span>{mode === 'isochrone' ? '5 / 10 / 15 分钟 · 最大吸附距离 500 m' : '按道路通行时间排序 · 最大吸附距离 500 m'}</span>
       </div>
 
       <PointValue label={mode === 'nearest' ? '当前位置' : '起点'} point={start} />
       {mode === 'shortest' && <PointValue label="终点" point={end} />}
-      <p className={`route-message is-${status}`} role="status" aria-live="polite">{MESSAGE[status]}</p>
+      <p className={`route-message is-${status}`} role="status" aria-live="polite">{statusMessage}</p>
 
       {route && status === 'success' && (
         <div className="route-metrics">
@@ -118,9 +133,28 @@ export default function RoutingPanel({
         </div>
       )}
 
+      {mode === 'isochrone' && isochroneResult && status === 'success' && (
+        <div className="isochrone-results">
+          <div className="isochrone-snap">
+            <span>起点吸附距离</span>
+            <strong>{isochroneResult.snap.snap_distance_m.toFixed(1)} m</strong>
+          </div>
+          <div className="isochrone-band-list">
+            {isochroneResult.isochrones.features.map((feature) => (
+              <div className={`isochrone-band is-${feature.properties.minutes}`} key={feature.properties.minutes}>
+                <strong>{feature.properties.minutes} 分钟</strong>
+                <span>{feature.properties.reachable_node_count.toLocaleString()} 个节点</span>
+                <b>{feature.properties.area_km2.toFixed(3)} km²</b>
+              </div>
+            ))}
+          </div>
+          <p className="isochrone-note">基于静态道路速度估算 · 顶点可达范围近似边界</p>
+        </div>
+      )}
+
       <div className="route-actions">
         <button className="route-clear" type="button" onClick={onClear} disabled={!start && status === 'selecting_start'}>重新选择</button>
-        <button className="route-clear" type="button" onClick={onClearResult} disabled={!shortestResult && !nearestResult}>清除路线</button>
+        <button className="route-clear" type="button" onClick={onClearResult} disabled={!shortestResult && !nearestResult && !isochroneResult}>清除结果</button>
       </div>
     </section>
   )

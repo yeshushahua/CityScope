@@ -7,6 +7,7 @@ import {
   checkDatabase,
   checkHealth,
   fetchNearbyPois,
+  fetchIsochrone,
   fetchNearestFacility,
   fetchShortestPath,
   fetchSpatialSummary,
@@ -22,6 +23,7 @@ import type {
 } from './types/spatial'
 import type {
   FacilityPreset,
+  IsochroneResponse,
   NearestFacilityResponse,
   RoutingMode,
   RoutingStatus,
@@ -50,6 +52,7 @@ export default function App() {
   const [facilityPreset, setFacilityPreset] = useState<FacilityPreset>('hospital')
   const [shortestResult, setShortestResult] = useState<ShortestPathResponse | null>(null)
   const [nearestResult, setNearestResult] = useState<NearestFacilityResponse | null>(null)
+  const [isochroneResult, setIsochroneResult] = useState<IsochroneResponse | null>(null)
 
   useEffect(() => {
     let active = true
@@ -106,14 +109,18 @@ export default function App() {
     setRoutingStatus('loading')
     setShortestResult(null)
     setNearestResult(null)
+    setIsochroneResult(null)
     const request = routingMode === 'shortest'
       ? fetchShortestPath(routeStart, routeEnd!, controller.signal)
-      : fetchNearestFacility(routeStart, facilityPreset, controller.signal)
+      : routingMode === 'nearest'
+        ? fetchNearestFacility(routeStart, facilityPreset, controller.signal)
+        : fetchIsochrone(routeStart, controller.signal)
     request
       .then((result) => {
         if (controller.signal.aborted) return
         if (routingMode === 'shortest') setShortestResult(result as ShortestPathResponse)
-        else setNearestResult(result as NearestFacilityResponse)
+        else if (routingMode === 'nearest') setNearestResult(result as NearestFacilityResponse)
+        else setIsochroneResult(result as IsochroneResponse)
         setRoutingStatus('success')
       })
       .catch((error: unknown) => {
@@ -140,11 +147,13 @@ export default function App() {
     setRouteEnd(null)
     setShortestResult(null)
     setNearestResult(null)
+    setIsochroneResult(null)
     setRoutingStatus('selecting_start')
   }, [])
   const clearRoutingResult = useCallback(() => {
     setShortestResult(null)
     setNearestResult(null)
+    setIsochroneResult(null)
     setRoutingStatus('idle')
   }, [])
   const changeRoutingMode = useCallback((mode: RoutingMode) => {
@@ -153,10 +162,11 @@ export default function App() {
     setRouteEnd(null)
     setShortestResult(null)
     setNearestResult(null)
+    setIsochroneResult(null)
     setRoutingStatus('selecting_start')
   }, [])
   const selectRoutingPoint = useCallback((point: QueryCenter) => {
-    if (routingMode === 'nearest') {
+    if (routingMode === 'nearest' || routingMode === 'isochrone') {
       setRouteStart(point)
       setRouteEnd(null)
       return
@@ -198,6 +208,7 @@ export default function App() {
           facilityPreset={facilityPreset}
           shortestResult={shortestResult}
           nearestResult={nearestResult}
+          isochroneResult={isochroneResult}
           onRoutingModeChange={changeRoutingMode}
           onFacilityPresetChange={setFacilityPreset}
           onClearRouting={clearRouting}
@@ -219,6 +230,7 @@ export default function App() {
             routeEnd={routeEnd}
             shortestResult={shortestResult}
             nearestResult={nearestResult}
+            isochroneResult={isochroneResult}
             onSelectRoutingPoint={selectRoutingPoint}
           />
         </main>

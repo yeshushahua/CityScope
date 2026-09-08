@@ -9,6 +9,10 @@ from sqlalchemy.types import BigInteger
 
 from app.schemas.routing import (
     FacilityCandidate,
+    IsochroneFeature,
+    IsochroneFeatureCollection,
+    IsochroneProperties,
+    IsochroneResponse,
     NearestFacilityMeta,
     NearestFacilityResponse,
     NetworkSnap,
@@ -19,6 +23,93 @@ from app.schemas.routing import (
 )
 
 EDGES_SQL = "SELECT id, source, target, cost, reverse_cost FROM routing_edges"
+ISOCHRONE_THRESHOLDS = (300, 600, 900)
+CONCAVE_HULL_TARGET_PERCENT = 0.85
+DEGENERATE_BUFFER_M = 20.0
+NESTING_TOLERANCE_M = 0.1
+
+ISOCHRONE_SQL = """
+WITH driving AS MATERIALIZED (
+    SELECT node, agg_cost
+    FROM pgr_drivingDistance(
+        :edges_sql,
+        CAST(:start_node AS bigint),
+        900,
+        directed => true
+    )
+),
+thresholds(minutes, threshold_s) AS (
+    VALUES (5, 300), (10, 600), (15, 900)
+),
+node_sets AS (
+    SELECT t.minutes,
+           t.threshold_s,
+           COUNT(d.node)::integer AS reachable_node_count,
+           ST_Collect(ST_Transform(n.geometry, 32648)) AS points_utm
+    FROM thresholds AS t
+    LEFT JOIN driving AS d ON d.agg_cost <= t.threshold_s
+    LEFT JOIN road_nodes AS n ON n.osm_node_id = d.node
+    GROUP BY t.minutes, t.threshold_s
+),
+raw_areas AS (
+    SELECT minutes,
+           threshold_s,
+           reachable_node_count,
+           CASE
+               WHEN reachable_node_count >= 3
+                    AND ST_Area(ST_ConvexHull(points_utm)) > 0
+               THEN ST_CollectionExtract(
+                   ST_MakeValid(
+                       ST_ConcaveHull(points_utm, :hull_target_percent, false)
+                   ),
+                   3
+               )
+               ELSE ST_Multi(ST_Buffer(points_utm, :fallback_buffer_m))
+           END AS geometry_utm
+    FROM node_sets
+),
+area_5 AS (
+    SELECT reachable_node_count,
+           ST_Multi(ST_CollectionExtract(ST_MakeValid(geometry_utm), 3)) AS geometry_utm
+    FROM raw_areas WHERE threshold_s = 300
+),
+area_10 AS (
+    SELECT r.reachable_node_count,
+           ST_Multi(ST_CollectionExtract(
+               ST_MakeValid(ST_Buffer(
+                   ST_UnaryUnion(ST_Collect(r.geometry_utm, a.geometry_utm)),
+                   :nesting_tolerance_m
+               )), 3
+           )) AS geometry_utm
+    FROM raw_areas AS r CROSS JOIN area_5 AS a
+    WHERE r.threshold_s = 600
+),
+area_15 AS (
+    SELECT r.reachable_node_count,
+           ST_Multi(ST_CollectionExtract(
+               ST_MakeValid(ST_Buffer(
+                   ST_UnaryUnion(ST_Collect(r.geometry_utm, a.geometry_utm)),
+                   :nesting_tolerance_m
+               )), 3
+           )) AS geometry_utm
+    FROM raw_areas AS r CROSS JOIN area_10 AS a
+    WHERE r.threshold_s = 900
+),
+final_areas(minutes, threshold_s, reachable_node_count, geometry_utm) AS (
+    SELECT 5, 300, reachable_node_count, geometry_utm FROM area_5
+    UNION ALL
+    SELECT 10, 600, reachable_node_count, geometry_utm FROM area_10
+    UNION ALL
+    SELECT 15, 900, reachable_node_count, geometry_utm FROM area_15
+)
+SELECT minutes,
+       threshold_s,
+       reachable_node_count,
+       ST_Area(geometry_utm) AS area_m2,
+       ST_AsGeoJSON(ST_Transform(geometry_utm, 4326), 15)::json AS geometry
+FROM final_areas
+ORDER BY threshold_s
+"""
 
 
 class SnapNotFoundError(ValueError):
@@ -34,6 +125,10 @@ class FacilityNotFoundError(ValueError):
 
 
 class ReachableFacilityNotFoundError(ValueError):
+    pass
+
+
+class IsochroneGeometryError(RuntimeError):
     pass
 
 
@@ -365,4 +460,62 @@ def nearest_facility(
             unreachable_count=len(facilities) - len(reachable),
             returned_count=len(candidates),
         ),
+    )
+
+
+def isochrone(
+    db: Session,
+    *,
+    origin: RoutePoint,
+    max_snap_m: int,
+) -> IsochroneResponse:
+    origin_snap = snap_point_to_network(
+        db, lon=origin.lon, lat=origin.lat, max_snap_m=max_snap_m
+    )
+    rows = list(
+        db.execute(
+            text(ISOCHRONE_SQL),
+            {
+                "edges_sql": EDGES_SQL,
+                "start_node": origin_snap.node_id,
+                "hull_target_percent": CONCAVE_HULL_TARGET_PERCENT,
+                "fallback_buffer_m": DEGENERATE_BUFFER_M,
+                "nesting_tolerance_m": NESTING_TOLERANCE_M,
+            },
+        ).mappings()
+    )
+    if len(rows) != 3:
+        raise IsochroneGeometryError("Isochrone query did not return all time bands")
+
+    features: list[IsochroneFeature] = []
+    for row, expected_threshold in zip(rows, ISOCHRONE_THRESHOLDS, strict=True):
+        geometry = row["geometry"]
+        if isinstance(geometry, str):
+            geometry = json.loads(geometry)
+        if (
+            int(row["threshold_s"]) != expected_threshold
+            or not geometry
+            or geometry.get("type") not in {"Polygon", "MultiPolygon"}
+        ):
+            raise IsochroneGeometryError("Isochrone polygon construction failed")
+        area_m2 = float(row["area_m2"])
+        if area_m2 <= 0:
+            raise IsochroneGeometryError("Isochrone area is empty")
+        features.append(
+            IsochroneFeature(
+                geometry=geometry,
+                properties=IsochroneProperties(
+                    minutes=int(row["minutes"]),
+                    threshold_s=expected_threshold,
+                    reachable_node_count=int(row["reachable_node_count"]),
+                    area_m2=round(area_m2, 1),
+                    area_km2=round(area_m2 / 1_000_000, 3),
+                ),
+            )
+        )
+
+    return IsochroneResponse(
+        origin=origin,
+        snap=origin_snap,
+        isochrones=IsochroneFeatureCollection(features=features),
     )

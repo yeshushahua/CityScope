@@ -81,3 +81,31 @@ class NearestFacilityResponse(BaseModel):
     candidates: list[FacilityCandidate]
     route: RouteFeature
     meta: NearestFacilityMeta
+
+
+class IsochroneProperties(BaseModel):
+    minutes: Literal[5, 10, 15]
+    threshold_s: Literal[300, 600, 900]
+    reachable_node_count: int
+    area_m2: float
+    area_km2: float
+
+
+class IsochroneFeature(BaseModel):
+    type: Literal["Feature"] = "Feature"
+    geometry: dict[str, Any]
+    properties: IsochroneProperties
+
+
+class IsochroneFeatureCollection(BaseModel):
+    type: Literal["FeatureCollection"] = "FeatureCollection"
+    features: list[IsochroneFeature]
+
+
+class IsochroneResponse(BaseModel):
+    origin: RoutePoint
+    snap: NetworkSnap
+    cost_model: Literal["static_travel_time"] = "static_travel_time"
+    directed: Literal[True] = True
+    max_analysis_time_s: Literal[900] = 900
+    isochrones: IsochroneFeatureCollection

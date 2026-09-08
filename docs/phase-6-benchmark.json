@@ -1,0 +1,604 @@
+{
+  "generated_at": "2026-09-08T22:04:48.151535+08:00",
+  "method": {
+    "cost_model": "static_travel_time",
+    "directed": true,
+    "thresholds_s": [
+      300,
+      600,
+      900
+    ],
+    "single_driving_distance_per_query": true,
+    "concave_hull_target_percent": 0.85,
+    "degenerate_buffer_m": 20.0,
+    "nesting_tolerance_m": 0.1,
+    "geometry_timing_note": "database_total minus standalone driving-distance time"
+  },
+  "database": {
+    "postgresql": "PostgreSQL 16.4 (Debian 16.4-1.pgdg110+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit",
+    "postgis": "POSTGIS=\"3.4.3 e365945\" [EXTENSION] PGSQL=\"160\" GEOS=\"3.9.0-CAPI-1.16.2\" PROJ=\"7.2.1 NETWORK_ENABLED=OFF URL_ENDPOINT=https://cdn.proj.org USER_WRITABLE_DIRECTORY=/var/lib/postgresql/.local/share/proj DATABASE_PATH=/usr/share/proj/proj.db\" LIBXML=\"2.9.10\" LIBJSON=\"0.15\" LIBPROTOBUF=\"1.3.3\" WAGYU=\"0.5.0 (Internal)\" TOPOLOGY",
+    "pgrouting": "3.8.0",
+    "road_nodes": 8286,
+    "routing_edges": 18441
+  },
+  "cases": [
+    {
+      "label": "west_edge",
+      "origin": {
+        "lon": 103.62,
+        "lat": 36.07
+      },
+      "snap": {
+        "node_id": 4210765883,
+        "node_lon": 103.6195495,
+        "node_lat": 36.0690547,
+        "snap_distance_m": 112.5
+      },
+      "timing_ms": {
+        "snap": 2.061,
+        "driving_distance": 16.746,
+        "geometry": 34.628,
+        "database_total": 51.375,
+        "total_api": 60.265
+      },
+      "driving_row_count": 617,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 18,
+          "area_m2": 780504.2,
+          "area_km2": 0.781
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 77,
+          "area_m2": 6063936.0,
+          "area_km2": 6.064
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 617,
+          "area_m2": 22099743.0,
+          "area_km2": 22.1
+        }
+      ]
+    },
+    {
+      "label": "west",
+      "origin": {
+        "lon": 103.68,
+        "lat": 36.09
+      },
+      "snap": {
+        "node_id": 5636152833,
+        "node_lon": 103.6787322,
+        "node_lat": 36.0921946,
+        "snap_distance_m": 269.0
+      },
+      "timing_ms": {
+        "snap": 2.143,
+        "driving_distance": 43.395,
+        "geometry": 41.774,
+        "database_total": 85.168,
+        "total_api": 92.195
+      },
+      "driving_row_count": 3424,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 515,
+          "area_m2": 21457628.6,
+          "area_km2": 21.458
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2127,
+          "area_m2": 93822821.7,
+          "area_km2": 93.823
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 3424,
+          "area_m2": 185931274.7,
+          "area_km2": 185.931
+        }
+      ]
+    },
+    {
+      "label": "qilihe_west",
+      "origin": {
+        "lon": 103.72,
+        "lat": 36.05
+      },
+      "snap": {
+        "node_id": 4116109993,
+        "node_lon": 103.7196962,
+        "node_lat": 36.049537,
+        "snap_distance_m": 58.2
+      },
+      "timing_ms": {
+        "snap": 2.237,
+        "driving_distance": 36.975,
+        "geometry": 194.395,
+        "database_total": 231.37,
+        "total_api": 208.211
+      },
+      "driving_row_count": 2717,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 181,
+          "area_m2": 9621595.6,
+          "area_km2": 9.622
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1111,
+          "area_m2": 39059074.9,
+          "area_km2": 39.059
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 2717,
+          "area_m2": 128203304.1,
+          "area_km2": 128.203
+        }
+      ]
+    },
+    {
+      "label": "qilihe",
+      "origin": {
+        "lon": 103.78,
+        "lat": 36.06
+      },
+      "snap": {
+        "node_id": 11293237374,
+        "node_lon": 103.7801783,
+        "node_lat": 36.059145,
+        "snap_distance_m": 96.2
+      },
+      "timing_ms": {
+        "snap": 2.165,
+        "driving_distance": 55.731,
+        "geometry": 64.132,
+        "database_total": 119.863,
+        "total_api": 128.051
+      },
+      "driving_row_count": 4999,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 791,
+          "area_m2": 21087489.3,
+          "area_km2": 21.087
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2718,
+          "area_m2": 106716475.1,
+          "area_km2": 106.716
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4999,
+          "area_m2": 239922136.7,
+          "area_km2": 239.922
+        }
+      ]
+    },
+    {
+      "label": "city_center",
+      "origin": {
+        "lon": 103.8343,
+        "lat": 36.0611
+      },
+      "snap": {
+        "node_id": 4077238566,
+        "node_lon": 103.8333381,
+        "node_lat": 36.0593936,
+        "snap_distance_m": 208.2
+      },
+      "timing_ms": {
+        "snap": 2.081,
+        "driving_distance": 51.973,
+        "geometry": 65.508,
+        "database_total": 117.48,
+        "total_api": 118.179
+      },
+      "driving_row_count": 4556,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 1001,
+          "area_m2": 18544285.0,
+          "area_km2": 18.544
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 3079,
+          "area_m2": 77577552.1,
+          "area_km2": 77.578
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 4556,
+          "area_m2": 206718703.6,
+          "area_km2": 206.719
+        }
+      ]
+    },
+    {
+      "label": "chengguan_east",
+      "origin": {
+        "lon": 103.88,
+        "lat": 36.06
+      },
+      "snap": {
+        "node_id": 1678859399,
+        "node_lon": 103.8808422,
+        "node_lat": 36.0598027,
+        "snap_distance_m": 79.0
+      },
+      "timing_ms": {
+        "snap": 2.147,
+        "driving_distance": 40.972,
+        "geometry": 49.189,
+        "database_total": 90.162,
+        "total_api": 97.963
+      },
+      "driving_row_count": 3633,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 891,
+          "area_m2": 16218586.3,
+          "area_km2": 16.219
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 2381,
+          "area_m2": 60119288.0,
+          "area_km2": 60.119
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 3633,
+          "area_m2": 173096584.5,
+          "area_km2": 173.097
+        }
+      ]
+    },
+    {
+      "label": "east",
+      "origin": {
+        "lon": 103.93,
+        "lat": 36.05
+      },
+      "snap": {
+        "node_id": 5643818640,
+        "node_lon": 103.9296341,
+        "node_lat": 36.0492421,
+        "snap_distance_m": 90.3
+      },
+      "timing_ms": {
+        "snap": 2.02,
+        "driving_distance": 48.729,
+        "geometry": 103.764,
+        "database_total": 152.493,
+        "total_api": 157.145
+      },
+      "driving_row_count": 2590,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 125,
+          "area_m2": 7646724.8,
+          "area_km2": 7.647
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 1047,
+          "area_m2": 65937654.5,
+          "area_km2": 65.938
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 2590,
+          "area_m2": 155600414.8,
+          "area_km2": 155.6
+        }
+      ]
+    },
+    {
+      "label": "east_edge",
+      "origin": {
+        "lon": 104.0,
+        "lat": 36.06
+      },
+      "snap": {
+        "node_id": 4076745437,
+        "node_lon": 104.0019746,
+        "node_lat": 36.0601269,
+        "snap_distance_m": 178.5
+      },
+      "timing_ms": {
+        "snap": 2.022,
+        "driving_distance": 13.387,
+        "geometry": 52.693,
+        "database_total": 66.081,
+        "total_api": 72.398
+      },
+      "driving_row_count": 398,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 30,
+          "area_m2": 2477038.3,
+          "area_km2": 2.477
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 113,
+          "area_m2": 18889623.5,
+          "area_km2": 18.89
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 398,
+          "area_m2": 65940565.5,
+          "area_km2": 65.941
+        }
+      ]
+    },
+    {
+      "label": "northwest_edge",
+      "origin": {
+        "lon": 103.75,
+        "lat": 36.13
+      },
+      "snap": {
+        "node_id": 13088607498,
+        "node_lon": 103.7463653,
+        "node_lat": 36.1311519,
+        "snap_distance_m": 351.3
+      },
+      "timing_ms": {
+        "snap": 2.055,
+        "driving_distance": 17.583,
+        "geometry": 159.634,
+        "database_total": 177.217,
+        "total_api": 183.479
+      },
+      "driving_row_count": 858,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 62,
+          "area_m2": 1973972.6,
+          "area_km2": 1.974
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 172,
+          "area_m2": 11543192.9,
+          "area_km2": 11.543
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 858,
+          "area_m2": 38636150.9,
+          "area_km2": 38.636
+        }
+      ]
+    },
+    {
+      "label": "northeast_edge",
+      "origin": {
+        "lon": 103.91,
+        "lat": 36.12
+      },
+      "snap": {
+        "node_id": 7707928933,
+        "node_lon": 103.9090504,
+        "node_lat": 36.1196792,
+        "snap_distance_m": 92.6
+      },
+      "timing_ms": {
+        "snap": 2.144,
+        "driving_distance": 18.206,
+        "geometry": 164.48,
+        "database_total": 182.686,
+        "total_api": 183.159
+      },
+      "driving_row_count": 971,
+      "database_band_count": 3,
+      "bands": [
+        {
+          "minutes": 5,
+          "threshold_s": 300,
+          "reachable_node_count": 87,
+          "area_m2": 3021989.8,
+          "area_km2": 3.022
+        },
+        {
+          "minutes": 10,
+          "threshold_s": 600,
+          "reachable_node_count": 170,
+          "area_m2": 8670392.9,
+          "area_km2": 8.67
+        },
+        {
+          "minutes": 15,
+          "threshold_s": 900,
+          "reachable_node_count": 971,
+          "area_m2": 50548700.7,
+          "area_km2": 50.549
+        }
+      ]
+    }
+  ],
+  "summary_ms": {
+    "snap": {
+      "average": 2.107,
+      "minimum": 2.02,
+      "maximum": 2.237
+    },
+    "driving_distance": {
+      "average": 34.37,
+      "minimum": 13.387,
+      "maximum": 55.731
+    },
+    "geometry": {
+      "average": 93.02,
+      "minimum": 34.628,
+      "maximum": 194.395
+    },
+    "database_total": {
+      "average": 127.389,
+      "minimum": 51.375,
+      "maximum": 231.37
+    },
+    "total_api": {
+      "average": 130.105,
+      "minimum": 60.265,
+      "maximum": 208.211
+    }
+  },
+  "one_way_validation": {
+    "edge": {
+      "id": 13266,
+      "osm_id": "420345709",
+      "source": 6528742291,
+      "target": 6528742285,
+      "cost": 0.15914965112557403,
+      "reverse_cost": -1.0
+    },
+    "forward_target_result": {
+      "node": 6528742285,
+      "edge": 13266,
+      "agg_cost": 0.15914965112557403
+    },
+    "reverse_source_result": {
+      "node": 6528742291,
+      "edge": 488,
+      "agg_cost": 2.5160657528706913
+    },
+    "reverse_did_not_use_forbidden_edge": true
+  },
+  "explain": {
+    "snap": [
+      "Limit  (cost=21.06..33.83 rows=1 width=24) (actual time=0.124..0.125 rows=1 loops=1)",
+      "  Buffers: shared hit=35",
+      "  ->  Result  (cost=21.06..33.83 rows=1 width=24) (actual time=0.124..0.124 rows=1 loops=1)",
+      "        Buffers: shared hit=35",
+      "        ->  Sort  (cost=21.06..21.06 rows=1 width=48) (actual time=0.121..0.121 rows=1 loops=1)",
+      "              Sort Key: (((n.geometry)::geography <-> '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography)), n.osm_node_id",
+      "              Sort Method: top-N heapsort  Memory: 25kB",
+      "              Buffers: shared hit=35",
+      "              ->  Index Scan using idx_road_nodes_geography on road_nodes n  (cost=0.28..21.05 rows=1 width=48) (actual time=0.022..0.116 rows=25 loops=1)",
+      "                    Index Cond: ((geometry)::geography && _st_expand('0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision))",
+      "                    Filter: st_dwithin((geometry)::geography, '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '500'::double precision, true)",
+      "                    Rows Removed by Filter: 39",
+      "                    Buffers: shared hit=35",
+      "Planning Time: 0.078 ms",
+      "Execution Time: 0.135 ms"
+    ],
+    "isochrone_core": [
+      "Sort  (cost=13340.87..13340.87 rows=3 width=52) (actual time=105.096..105.101 rows=3 loops=1)",
+      "  Sort Key: (300)",
+      "  Sort Method: quicksort  Memory: 57kB",
+      "  Buffers: shared hit=1012",
+      "  CTE driving",
+      "    ->  Function Scan on pgr_drivingdistance  (cost=0.25..10.25 rows=1000 width=16) (actual time=45.621..45.816 rows=4556 loops=1)",
+      "          Buffers: shared hit=912",
+      "  CTE raw_areas",
+      "    ->  Subquery Scan on node_sets  (cost=413.93..13201.98 rows=3 width=44) (actual time=57.340..104.274 rows=3 loops=1)",
+      "          Buffers: shared hit=1012",
+      "          ->  GroupAggregate  (cost=413.93..13050.84 rows=3 width=44) (actual time=50.281..53.910 rows=3 loops=1)",
+      "                Group Key: \"*VALUES*\".column1, \"*VALUES*\".column2",
+      "                Buffers: shared hit=1012",
+      "                ->  Sort  (cost=413.93..416.43 rows=1000 width=48) (actual time=49.831..50.060 rows=8636 loops=1)",
+      "                      Sort Key: \"*VALUES*\".column1, \"*VALUES*\".column2",
+      "                      Sort Method: quicksort  Memory: 992kB",
+      "                      Buffers: shared hit=1012",
+      "                      ->  Nested Loop Left Join  (cost=286.44..364.10 rows=1000 width=48) (actual time=46.582..49.030 rows=8636 loops=1)",
+      "                            Join Filter: (d.agg_cost <= (\"*VALUES*\".column2)::double precision)",
+      "                            Rows Removed by Join Filter: 5032",
+      "                            Buffers: shared hit=1012",
+      "                            ->  Values Scan on \"*VALUES*\"  (cost=0.00..0.04 rows=3 width=8) (actual time=0.001..0.003 rows=3 loops=1)",
+      "                            ->  Materialize  (cost=286.44..314.06 rows=1000 width=48) (actual time=15.527..16.086 rows=4556 loops=3)",
+      "                                  Buffers: shared hit=1012",
+      "                                  ->  Hash Left Join  (cost=286.44..309.06 rows=1000 width=48) (actual time=46.578..47.618 rows=4556 loops=1)",
+      "                                        Hash Cond: (d.node = n.osm_node_id)",
+      "                                        Buffers: shared hit=1012",
+      "                                        ->  CTE Scan on driving d  (cost=0.00..20.00 rows=1000 width=16) (actual time=45.622..46.199 rows=4556 loops=1)",
+      "                                              Buffers: shared hit=912",
+      "                                        ->  Hash  (cost=182.86..182.86 rows=8286 width=40) (actual time=0.946..0.947 rows=8286 loops=1)",
+      "                                              Buckets: 16384  Batches: 1  Memory Usage: 711kB",
+      "                                              Buffers: shared hit=100",
+      "                                              ->  Seq Scan on road_nodes n  (cost=0.00..182.86 rows=8286 width=40) (actual time=0.014..0.437 rows=8286 loops=1)",
+      "                                                    Buffers: shared hit=100",
+      "  CTE area_5",
+      "    ->  CTE Scan on raw_areas  (cost=0.00..12.82 rows=1 width=36) (actual time=57.364..104.301 rows=1 loops=1)",
+      "          Filter: (threshold_s = 300)",
+      "          Rows Removed by Filter: 2",
+      "          Buffers: shared hit=1012",
+      "  CTE area_10",
+      "    ->  Nested Loop  (cost=0.00..37.97 rows=1 width=36) (actual time=0.236..0.237 rows=1 loops=1)",
+      "          ->  CTE Scan on raw_areas r_1  (cost=0.00..0.07 rows=1 width=36) (actual time=0.002..0.002 rows=1 loops=1)",
+      "                Filter: (threshold_s = 600)",
+      "                Rows Removed by Filter: 2",
+      "          ->  CTE Scan on area_5 a_1  (cost=0.00..0.02 rows=1 width=32) (actual time=0.001..0.001 rows=1 loops=1)",
+      "  ->  Result  (cost=0.00..77.82 rows=3 width=52) (actual time=57.417..105.091 rows=3 loops=1)",
+      "        Buffers: shared hit=1012",
+      "        ->  Append  (cost=0.00..38.03 rows=3 width=44) (actual time=57.366..104.820 rows=3 loops=1)",
+      "              Buffers: shared hit=1012",
+      "              ->  CTE Scan on area_5  (cost=0.00..0.02 rows=1 width=44) (actual time=57.366..104.303 rows=1 loops=1)",
+      "                    Buffers: shared hit=1012",
+      "              ->  CTE Scan on area_10  (cost=0.00..0.02 rows=1 width=44) (actual time=0.239..0.240 rows=1 loops=1)",
+      "              ->  Nested Loop  (cost=0.00..37.97 rows=1 width=44) (actual time=0.273..0.274 rows=1 loops=1)",
+      "                    ->  CTE Scan on raw_areas r  (cost=0.00..0.07 rows=1 width=36) (actual time=0.001..0.001 rows=1 loops=1)",
+      "                          Filter: (threshold_s = 900)",
+      "                          Rows Removed by Filter: 2",
+      "                    ->  CTE Scan on area_10 a  (cost=0.00..0.02 rows=1 width=32) (actual time=0.001..0.001 rows=1 loops=1)",
+      "Planning Time: 0.179 ms",
+      "Execution Time: 105.472 ms"
+    ]
+  }
+}
