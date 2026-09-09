@@ -2,17 +2,17 @@
 
 城市空间智能分析与应急响应平台
 
-**Current Status: Phase 7 - Completed**
+**Current Status: Phase 8 - Completed**
 
 CityScope 是以兰州市连续主城区及周边建成区为示范区域的 WebGIS 作品。当前已建立真实数据与基础空间查询链：
 
 ```text
-OpenStreetMap → OSMnx 有向路网 ETL → PostGIS + pgRouting → FastAPI → MapLibre
+OpenStreetMap → OSMnx 有向机动车/步行路网 ETL → PostGIS + pgRouting → FastAPI → MapLibre
 ```
 
 地图业务图层来自本地 PostGIS，不使用手写坐标或静态假数据。当前 Demo bbox 为 `(103.60, 35.98, 104.08, 36.16)`、CRS 为 EPSG:4326；它代表兰州市主城区示范研究区，不代表完整兰州市行政辖区。
 
-Phase 1–6 的地图、真实 PostGIS 数据、空间查询、18,441 条有向道路边、最短路径、最近设施和 5/10/15-minute road-network isochrones 保持可用。Phase 7 增加 Emergency response decision support、Network-time-based responder selection、Facility-to-incident directed routing 和 5/10/15-minute response service areas。系统按真实医院或消防站到事件点的静态有向道路时间推荐响应设施；这是静态 travel-time estimate 与决策支持演示，不是实际应急调度系统。
+Phase 1–7 的地图、真实 PostGIS 数据、空间查询、有向机动车路径、最近设施、机动车 Isochrone 和应急响应决策支持保持可用。Phase 8 增加 15-minute walking living-circle analysis：独立 OSM pedestrian network、network-time-based POI accessibility 和 service-category presence coverage。系统用 4.8 km/h static walking-speed assumption 计算居住点 connector、步行网络成本和 POI connector；结果表达网络可达性与设施类别存在情况，不作官方规划达标判断。
 
 ## 技术栈
 
@@ -29,18 +29,19 @@ CityScope/
 │   ├── components/map/layers/  # POI、建筑、路网与路径结果图层
 │   ├── components/routing/     # 点到点与最近设施面板
 │   ├── components/emergency/   # 医疗与消防应急响应面板
+│   ├── components/livingCircle/# 步行15分钟生活圈面板
 │   ├── components/layout/
 │   ├── services/               # 统一 API 请求
 │   └── types/
 ├── backend/app/
-│   ├── api/                    # 健康、GeoJSON、空间、路由与应急 API
+│   ├── api/                    # 健康、空间、路由、应急与生活圈 API
 │   ├── db/                     # engine、session、declarative base
 │   ├── models/                 # PostGIS 表模型
 │   ├── schemas/
-│   └── services/               # PostGIS / pgRouting 查询
+│   └── services/               # PostGIS / pgRouting 业务查询
 ├── backend/tests/
 ├── database/                   # PostGIS + pgRouting 镜像、init 与迁移
-├── scripts/osm/                # 下载、清洗、导入、样本导出
+├── scripts/osm/                # 机动车/步行网络、POI映射与数据 ETL
 ├── data/sample/                # 可提交的小型真实样本
 ├── docs/
 └── docker-compose.yml
@@ -68,9 +69,10 @@ cd ..
 ```powershell
 docker compose up --build -d postgres
 .\.venv\Scripts\python.exe scripts/osm/prepare_lanzhou.py --replace
+.\.venv\Scripts\python.exe scripts/osm/build_pedestrian_network.py --replace
 ```
 
-Compose 从锁定的 PostGIS 16-3.4 基础镜像构建并安装固定版本 pgRouting。ETL 将道路 GraphML、建筑与 POI 分块 GeoPackage 缓存到 `data/raw/osm/`，清洗结果放在 `data/interim/osm/`，这些大文件均不提交 Git。`--replace` 会在事务中重建路网与业务表，并为 healthcare/emergency POI 重建设施路网映射；不传参数且表已存在时会明确停止，避免意外重复。
+Compose 从锁定的 PostGIS 16-3.4 基础镜像构建并安装固定版本 pgRouting。ETL 将机动车与步行 GraphML、建筑和 POI GeoPackage 缓存到 `data/raw/osm/`，清洗结果放在 `data/interim/osm/`，这些大文件均不提交 Git。`prepare_lanzhou.py --replace` 重建基础业务与机动车网络；`build_pedestrian_network.py --replace` 幂等重建独立的 OSMnx walk 网络和 POI 步行节点映射。
 
 ## 本地运行
 
@@ -105,6 +107,7 @@ npm run dev
 - `GET /api/v1/routing/nearest-facility?lon=...&lat=...&category=healthcare&subcategory=hospital&limit=5`
 - `GET /api/v1/routing/isochrone?lon=103.8343&lat=36.0611&max_snap_m=500`
 - `POST /api/v1/emergency/response`：医疗/消防设施 many sources → one incident 响应分析
+- `POST /api/v1/living-circle/analyze`：5/10/15 分钟步行圈与 15 分钟网络可达生活服务
 
 建筑接口强制要求小范围 bbox；空间过滤使用 PostGIS `ST_Intersects` 与 `ST_MakeEnvelope`。
 
@@ -118,14 +121,14 @@ npm run build
 npm run preview -- --host 127.0.0.1 --port 4173 --strictPort
 ```
 
-完整数据准备记录见 [Phase 2 验证文档](docs/phase-2-validation.md)，空间查询见 [Phase 3 验证文档](docs/phase-3-validation.md)，路网结构见 [Phase 4 验证文档](docs/phase-4-validation.md)，Dijkstra 与最近设施见 [Phase 5 验证文档](docs/phase-5-validation.md)，道路时间 Isochrone 见 [Phase 6 验证文档](docs/phase-6-validation.md)，应急响应算法、真实案例、性能、EXPLAIN 与浏览器验收见 [Phase 7 验证文档](docs/phase-7-validation.md)。
+完整数据准备记录见 [Phase 2 验证文档](docs/phase-2-validation.md)，空间查询见 [Phase 3 验证文档](docs/phase-3-validation.md)，路网结构见 [Phase 4 验证文档](docs/phase-4-validation.md)，Dijkstra 与最近设施见 [Phase 5 验证文档](docs/phase-5-validation.md)，道路时间 Isochrone 见 [Phase 6 验证文档](docs/phase-6-validation.md)，应急响应见 [Phase 7 验证文档](docs/phase-7-validation.md)，步行网络、POI 可达性、真实案例、性能与浏览器验收见 [Phase 8 验证文档](docs/phase-8-validation.md)。
 
 ## 数据来源与限制
 
 业务空间数据来自 © OpenStreetMap contributors。底图 Attribution 保留 OpenFreeMap、OpenMapTiles 与 OpenStreetMap 链接。数据完整性受 OpenStreetMap 社区数据覆盖程度影响。
 
-静态速度是用于网络分析的估计值，不是实时交通速度或实时 ETA。路径和 Isochrone 使用顶点吸附，输入点到吸附节点的距离不计入道路成本。Isochrone 边界由可达道路节点的凹壳生成，是服务区近似边界；研究区的小连通分量和不可达设施会如实保留并报告。应急模块不含实时交通、车辆位置、出警准备时间或真实调度能力。
+静态速度是用于网络分析的估计值，不是实时交通速度或实时 ETA。机动车路径和 Isochrone 使用顶点吸附；生活圈则明确把居住点和 POI 的 connector 时间计入总步行时间。所有 Isochrone 边界均为可达节点凹壳近似；生活圈 POI 资格只按网络总时间判断，不按 Polygon 包含关系判断。研究区小连通分量和不可达设施会如实保留并报告。应急模块不含实时交通、车辆位置、出警准备时间或真实调度能力。
 
 ## 下一阶段
 
-Phase 8：15 分钟生活圈（尚未开发）。
+Phase 9：3D / 专题可视化 / UI 优化（尚未开发）。

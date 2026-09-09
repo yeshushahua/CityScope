@@ -1,3 +1,16 @@
-from app.models.osm import Building, Poi, PoiRoutingAccess, RoadEdge, RoadNode, RoutingEdge
+from app.models.osm import (
+    Building,
+    PedestrianEdge,
+    PedestrianNode,
+    Poi,
+    PoiRoutingAccess,
+    PoiWalkAccess,
+    RoadEdge,
+    RoadNode,
+    RoutingEdge,
+)
 
-__all__ = ["Building", "Poi", "PoiRoutingAccess", "RoadEdge", "RoadNode", "RoutingEdge"]
+__all__ = [
+    "Building", "PedestrianEdge", "PedestrianNode", "Poi", "PoiRoutingAccess",
+    "PoiWalkAccess", "RoadEdge", "RoadNode", "RoutingEdge",
+]

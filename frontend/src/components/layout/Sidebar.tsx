@@ -9,6 +9,12 @@ import SpatialQueryPanel from '../spatial/SpatialQueryPanel'
 import RoutingPanel from '../routing/RoutingPanel'
 import EmergencyPanel from '../emergency/EmergencyPanel'
 import type { EmergencyResponse, EmergencyStatus, IncidentType } from '../../types/emergency'
+import LivingCirclePanel from '../livingCircle/LivingCirclePanel'
+import type {
+  LivingCircleCategory,
+  LivingCircleResponse,
+  LivingCircleStatus,
+} from '../../types/livingCircle'
 import type {
   FacilityPreset,
   IsochroneResponse,
@@ -18,7 +24,7 @@ import type {
   ShortestPathResponse,
 } from '../../types/routing'
 
-export type ModuleId = 'overview' | 'spatial' | 'routing' | 'emergency' | 'accessibility'
+export type ModuleId = 'overview' | 'spatial' | 'routing' | 'emergency' | 'living-circle'
 export interface LayerVisibility { pois: boolean; buildings: boolean; roads: boolean }
 
 interface SidebarProps {
@@ -56,6 +62,13 @@ interface SidebarProps {
   onIncidentTypeChange: (value: IncidentType) => void
   onClearEmergency: () => void
   onReselectIncident: () => void
+  livingCircleOrigin: QueryCenter | null
+  livingCircleStatus: LivingCircleStatus
+  livingCircleResult: LivingCircleResponse | null
+  livingCircleCategories: LivingCircleCategory[]
+  onToggleLivingCircleCategory: (category: LivingCircleCategory) => void
+  onClearLivingCircle: () => void
+  onReselectLivingCircle: () => void
 }
 
 const MODULES: ReadonlyArray<{ id: ModuleId; label: string; description: string }> = [
@@ -63,7 +76,7 @@ const MODULES: ReadonlyArray<{ id: ModuleId; label: string; description: string 
   { id: 'spatial', label: '空间查询', description: '按点击位置执行 PostGIS 范围查询' },
   { id: 'routing', label: '路径规划', description: '计算最短路径、最快设施与道路时间可达圈' },
   { id: 'emergency', label: '应急响应', description: '医疗与消防响应决策支持' },
-  { id: 'accessibility', label: '可达性分析', description: '功能将在后续阶段开放' },
+  { id: 'living-circle', label: '15分钟生活圈', description: '沿真实步行网络分析核心服务可达性' },
 ]
 
 export default function Sidebar({
@@ -101,6 +114,13 @@ export default function Sidebar({
   onIncidentTypeChange,
   onClearEmergency,
   onReselectIncident,
+  livingCircleOrigin,
+  livingCircleStatus,
+  livingCircleResult,
+  livingCircleCategories,
+  onToggleLivingCircleCategory,
+  onClearLivingCircle,
+  onReselectLivingCircle,
 }: SidebarProps) {
   const activeItem = MODULES.find((item) => item.id === activeModule) ?? MODULES[0]
 
@@ -190,15 +210,26 @@ export default function Sidebar({
           onFocus={onFocusPoi}
         />
       )}
+      {activeModule === 'living-circle' && (
+        <LivingCirclePanel
+          origin={livingCircleOrigin}
+          status={livingCircleStatus}
+          result={livingCircleResult}
+          selectedCategories={livingCircleCategories}
+          onToggleCategory={onToggleLivingCircleCategory}
+          onClear={onClearLivingCircle}
+          onReselect={onReselectLivingCircle}
+        />
+      )}
       <div className={`database-status${databaseOnline ? ' is-online' : ''}`} role="status">
         <span className="status-dot" aria-hidden="true" />
         PostGIS {databaseOnline ? 'Connected' : 'Unavailable'}
       </div>
-      {activeModule !== 'spatial' && activeModule !== 'routing' && activeModule !== 'emergency' && <div className="module-note" role="status" aria-live="polite">
+      {activeModule === 'overview' && <div className="module-note" role="status" aria-live="polite">
         <strong>{activeItem.label}</strong>
         <span>{activeItem.description}</span>
       </div>}
-      <div className="phase-label">PHASE 7 · EMERGENCY RESPONSE</div>
+      <div className="phase-label">PHASE 8 · WALKING LIVING CIRCLE</div>
     </aside>
   )
 }

@@ -9,6 +9,7 @@ import {
   fetchNearbyPois,
   fetchIsochrone,
   fetchEmergencyResponse,
+  fetchLivingCircle,
   fetchNearestFacility,
   fetchShortestPath,
   fetchSpatialSummary,
@@ -31,6 +32,12 @@ import type {
   ShortestPathResponse,
 } from './types/routing'
 import type { EmergencyResponse, EmergencyStatus, IncidentType } from './types/emergency'
+import type {
+  LivingCircleCategory,
+  LivingCircleResponse,
+  LivingCircleStatus,
+} from './types/livingCircle'
+import { LIVING_CIRCLE_CATEGORIES } from './components/livingCircle/LivingCirclePanel'
 
 export type ApiStatus = 'checking' | 'online' | 'offline'
 
@@ -59,6 +66,12 @@ export default function App() {
   const [incident, setIncident] = useState<QueryCenter | null>(null)
   const [emergencyStatus, setEmergencyStatus] = useState<EmergencyStatus>('selecting')
   const [emergencyResult, setEmergencyResult] = useState<EmergencyResponse | null>(null)
+  const [livingCircleOrigin, setLivingCircleOrigin] = useState<QueryCenter | null>(null)
+  const [livingCircleStatus, setLivingCircleStatus] = useState<LivingCircleStatus>('selecting')
+  const [livingCircleResult, setLivingCircleResult] = useState<LivingCircleResponse | null>(null)
+  const [livingCircleCategories, setLivingCircleCategories] = useState<LivingCircleCategory[]>([
+    ...LIVING_CIRCLE_CATEGORIES,
+  ])
 
   useEffect(() => {
     let active = true
@@ -167,6 +180,37 @@ export default function App() {
     return () => controller.abort()
   }, [activeModule, incident, incidentType])
 
+  useEffect(() => {
+    if (activeModule !== 'living-circle') {
+      setLivingCircleOrigin(null)
+      setLivingCircleResult(null)
+      setLivingCircleStatus('selecting')
+      return
+    }
+    if (!livingCircleOrigin) {
+      setLivingCircleStatus('selecting')
+      return
+    }
+    const controller = new AbortController()
+    setLivingCircleStatus('loading')
+    setLivingCircleResult(null)
+    fetchLivingCircle(livingCircleOrigin, controller.signal)
+      .then((result) => {
+        if (controller.signal.aborted) return
+        setLivingCircleResult(result)
+        setLivingCircleStatus('success')
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return
+        const status = isAxiosError(error) ? error.response?.status : undefined
+        const detail = isAxiosError(error) ? String(error.response?.data?.detail ?? '') : ''
+        if (status === 422 && detail.includes('pedestrian network node')) setLivingCircleStatus('snap_failed')
+        else if (status === 404 || (status === 503 && detail.includes('Pedestrian network'))) setLivingCircleStatus('no_data')
+        else setLivingCircleStatus('error')
+      })
+    return () => controller.abort()
+  }, [activeModule, livingCircleOrigin])
+
   const selectModule = useCallback((moduleId: ModuleId) => setActiveModule(moduleId), [])
   const toggleLayer = useCallback((layer: keyof LayerVisibility) => {
     setLayers((current) => ({ ...current, [layer]: !current[layer] }))
@@ -221,6 +265,21 @@ export default function App() {
     setEmergencyResult(null)
     setEmergencyStatus('selecting')
   }, [])
+  const clearLivingCircle = useCallback(() => {
+    setLivingCircleOrigin(null)
+    setLivingCircleResult(null)
+    setLivingCircleStatus('selecting')
+  }, [])
+  const toggleLivingCircleCategory = useCallback((category: LivingCircleCategory) => {
+    setLivingCircleCategories((current) => current.includes(category)
+      ? current.filter((item) => item !== category)
+      : [...current, category])
+  }, [])
+  const selectLivingCircleOrigin = useCallback((point: QueryCenter) => {
+    setLivingCircleResult(null)
+    setLivingCircleStatus('loading')
+    setLivingCircleOrigin(point)
+  }, [])
 
   return (
     <div className="app-shell">
@@ -261,6 +320,13 @@ export default function App() {
           onIncidentTypeChange={changeIncidentType}
           onClearEmergency={clearEmergency}
           onReselectIncident={clearEmergency}
+          livingCircleOrigin={livingCircleOrigin}
+          livingCircleStatus={livingCircleStatus}
+          livingCircleResult={livingCircleResult}
+          livingCircleCategories={livingCircleCategories}
+          onToggleLivingCircleCategory={toggleLivingCircleCategory}
+          onClearLivingCircle={clearLivingCircle}
+          onReselectLivingCircle={clearLivingCircle}
         />
         <main className="map-main" aria-label="兰州市地图工作区">
           <CityMap
@@ -284,6 +350,11 @@ export default function App() {
             incident={incident}
             emergencyResult={emergencyResult}
             onSelectIncident={setIncident}
+            livingCircleModeActive={activeModule === 'living-circle'}
+            livingCircleOrigin={livingCircleOrigin}
+            livingCircleResult={livingCircleResult}
+            livingCircleCategories={livingCircleCategories}
+            onSelectLivingCircleOrigin={selectLivingCircleOrigin}
           />
         </main>
       </div>

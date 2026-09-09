@@ -4,6 +4,7 @@ import type { PoiCategory } from '../config/poiCategories'
 import type { NearbyPoiCollection, QueryCenter, SpatialSummary } from '../types/spatial'
 import type { FacilityPreset, IsochroneResponse, NearestFacilityResponse, ShortestPathResponse } from '../types/routing'
 import type { EmergencyResponse, IncidentType } from '../types/emergency'
+import type { LivingCircleResponse } from '../types/livingCircle'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -135,6 +136,18 @@ export async function fetchEmergencyResponse(
   const { data } = await api.post<EmergencyResponse>(
     '/api/v1/emergency/response',
     { incident, incident_type: incidentType, max_snap_m: 500, candidate_limit: 3 },
+    { signal },
+  )
+  return data
+}
+
+export async function fetchLivingCircle(
+  origin: QueryCenter,
+  signal?: AbortSignal,
+): Promise<LivingCircleResponse> {
+  const { data } = await api.post<LivingCircleResponse>(
+    '/api/v1/living-circle/analyze',
+    { origin, max_snap_m: 300 },
     { signal },
   )
   return data

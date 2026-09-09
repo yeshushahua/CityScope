@@ -149,3 +149,64 @@ class PoiRoutingAccess(Base):
             name="ck_poi_routing_access_snap_distance",
         ),
     )
+
+
+class PedestrianNode(Base):
+    __tablename__ = "pedestrian_nodes"
+
+    osm_node_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    geometry: Mapped[Any] = mapped_column(
+        Geometry("POINT", srid=4326, spatial_index=True), nullable=False
+    )
+
+
+class PedestrianEdge(Base):
+    __tablename__ = "pedestrian_edges"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    osm_id: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[int] = mapped_column(BigInteger, ForeignKey("pedestrian_nodes.osm_node_id"), nullable=False)
+    target: Mapped[int] = mapped_column(BigInteger, ForeignKey("pedestrian_nodes.osm_node_id"), nullable=False)
+    u: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    v: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    edge_key: Mapped[int] = mapped_column(Integer, nullable=False)
+    highway: Mapped[str | None] = mapped_column(Text)
+    name: Mapped[str | None] = mapped_column(Text)
+    length_m: Mapped[float] = mapped_column(Float, nullable=False)
+    walk_speed_kph: Mapped[float] = mapped_column(Float, nullable=False)
+    travel_time_s: Mapped[float] = mapped_column(Float, nullable=False)
+    cost: Mapped[float] = mapped_column(Float, nullable=False)
+    reverse_cost: Mapped[float] = mapped_column(Float, nullable=False, default=-1)
+    geometry: Mapped[Any] = mapped_column(
+        Geometry("LINESTRING", srid=4326, spatial_index=True), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("u", "v", "edge_key", name="uq_pedestrian_edges_uvkey"),
+        Index("ix_pedestrian_edges_source", "source"),
+        Index("ix_pedestrian_edges_target", "target"),
+        Index("ix_pedestrian_edges_highway", "highway"),
+    )
+
+
+class PoiWalkAccess(Base):
+    __tablename__ = "poi_walk_access"
+
+    poi_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("pois.id", ondelete="CASCADE"), primary_key=True
+    )
+    node_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("pedestrian_nodes.osm_node_id"), nullable=False
+    )
+    snap_distance_m: Mapped[float] = mapped_column(Float, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    __table_args__ = (
+        Index("ix_poi_walk_access_node_id", "node_id"),
+        CheckConstraint(
+            "snap_distance_m >= 0 AND snap_distance_m <= 300",
+            name="ck_poi_walk_access_snap_distance",
+        ),
+    )

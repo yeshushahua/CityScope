@@ -23,6 +23,7 @@ import type { LayerCounts, PoiProperties, RoadProperties } from '../../types/geo
 import type { FocusPoint, NearbyPoiCollection, QueryCenter } from '../../types/spatial'
 import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../types/routing'
 import type { EmergencyResponse } from '../../types/emergency'
+import type { LivingCircleCategory, LivingCircleResponse } from '../../types/livingCircle'
 import { fetchBuildings, fetchNetworkEdges, fetchPois } from '../../services/api'
 import MapCoordinates from './MapCoordinates'
 import MapStatus from './MapStatus'
@@ -64,6 +65,14 @@ import {
   setEmergencyVisibility,
   type EmergencyMapProperties,
 } from './layers/emergencyResultLayer'
+import {
+  addLivingCircleLayers,
+  LIVING_POI_LAYER_ID,
+  setLivingCircleCategoryFilter,
+  setLivingCircleData,
+  setLivingCircleVisibility,
+  type LivingCircleMapProperties,
+} from './layers/livingCircleLayer'
 
 setWorkerUrl(workerUrl)
 
@@ -206,6 +215,28 @@ function createEmergencyPopupContent(properties: EmergencyMapProperties): HTMLEl
   return content
 }
 
+function createLivingCirclePopupContent(properties: LivingCircleMapProperties): HTMLElement {
+  const content = document.createElement('div')
+  content.className = 'coordinate-popup living-circle-popup'
+  const title = document.createElement('strong')
+  title.textContent = properties.name || properties.label || '可达兴趣点'
+  content.append(title)
+  if (properties.kind === 'poi') {
+    const values = [
+      `类别：${properties.category} / ${properties.subcategory}`,
+      `总步行时间：${properties.total_walk_time_min.toFixed(2)} min`,
+      `网络时间：${(properties.network_time_s / 60).toFixed(2)} min`,
+      `POI 接驳：${properties.poi_connector_time_s.toFixed(1)} s`,
+    ]
+    content.append(...values.map((value) => {
+      const line = document.createElement('span')
+      line.textContent = value
+      return line
+    }))
+  }
+  return content
+}
+
 interface CityMapProps {
   layers: LayerVisibility
   onLayerCountsChange: (counts: LayerCounts) => void
@@ -227,6 +258,11 @@ interface CityMapProps {
   incident: QueryCenter | null
   emergencyResult: EmergencyResponse | null
   onSelectIncident: (point: QueryCenter) => void
+  livingCircleModeActive: boolean
+  livingCircleOrigin: QueryCenter | null
+  livingCircleResult: LivingCircleResponse | null
+  livingCircleCategories: LivingCircleCategory[]
+  onSelectLivingCircleOrigin: (point: QueryCenter) => void
 }
 
 export default function CityMap({
@@ -250,6 +286,11 @@ export default function CityMap({
   incident,
   emergencyResult,
   onSelectIncident,
+  livingCircleModeActive,
+  livingCircleOrigin,
+  livingCircleResult,
+  livingCircleCategories,
+  onSelectLivingCircleOrigin,
 }: CityMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<Map | null>(null)
@@ -277,6 +318,11 @@ export default function CityMap({
   const incidentRef = useRef(incident)
   const emergencyResultRef = useRef(emergencyResult)
   const selectIncidentRef = useRef(onSelectIncident)
+  const livingCircleModeActiveRef = useRef(livingCircleModeActive)
+  const livingCircleOriginRef = useRef(livingCircleOrigin)
+  const livingCircleResultRef = useRef(livingCircleResult)
+  const livingCircleCategoriesRef = useRef(livingCircleCategories)
+  const selectLivingCircleOriginRef = useRef(onSelectLivingCircleOrigin)
   const [coordinates, setCoordinates] = useState<MapCoordinatesValue | null>(null)
   const [loadStatus, setLoadStatus] = useState<MapLoadStatus>('loading')
 
@@ -284,7 +330,7 @@ export default function CityMap({
     layersRef.current = layers
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layers.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
+    setPoiVisibility(map, layers.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
     setBuildingVisibility(map, layers.buildings)
     setRoadVisibility(map, layers.roads)
     if (layers.buildings) {
@@ -312,7 +358,7 @@ export default function CityMap({
     selectQueryCenterRef.current = onSelectQueryCenter
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layersRef.current.pois && !spatialMode && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
+    setPoiVisibility(map, layersRef.current.pois && !spatialMode && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
     setSpatialQueryVisibility(map, spatialMode)
     setSpatialQueryData(map, queryCenter, queryRadiusM, queryResults)
   }, [spatialMode, queryCenter, queryRadiusM, queryResults, onSelectQueryCenter])
@@ -328,7 +374,7 @@ export default function CityMap({
     selectRoutingPointRef.current = onSelectRoutingPoint
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive && !emergencyModeActiveRef.current)
+    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
     setRoutingVisibility(map, routingModeActive)
     if (routingModeActive) {
       setIsochroneVisibility(map, routingMode === 'isochrone')
@@ -347,7 +393,7 @@ export default function CityMap({
     selectIncidentRef.current = onSelectIncident
     const map = mapRef.current
     if (!map || !map.loaded()) return
-    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActive)
+    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActive && !livingCircleModeActiveRef.current)
     setEmergencyVisibility(map, emergencyModeActive)
     setEmergencyData(map, incident, emergencyResult)
     if (emergencyModeActive) {
@@ -358,6 +404,20 @@ export default function CityMap({
       setIsochroneVisibility(map, false)
     }
   }, [emergencyModeActive, incident, emergencyResult, onSelectIncident])
+
+  useEffect(() => {
+    livingCircleModeActiveRef.current = livingCircleModeActive
+    livingCircleOriginRef.current = livingCircleOrigin
+    livingCircleResultRef.current = livingCircleResult
+    livingCircleCategoriesRef.current = livingCircleCategories
+    selectLivingCircleOriginRef.current = onSelectLivingCircleOrigin
+    const map = mapRef.current
+    if (!map || !map.loaded()) return
+    setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActive)
+    setLivingCircleVisibility(map, livingCircleModeActive)
+    setLivingCircleData(map, livingCircleOrigin, livingCircleResult)
+    setLivingCircleCategoryFilter(map, livingCircleCategories)
+  }, [livingCircleModeActive, livingCircleOrigin, livingCircleResult, livingCircleCategories, onSelectLivingCircleOrigin])
 
   useEffect(() => {
     if (!focusPoint) return
@@ -460,11 +520,12 @@ export default function CityMap({
       hasLoaded = true
       addRoadLayer(map, layersRef.current.roads)
       addBuildingLayer(map, layersRef.current.buildings)
-      addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current)
+      addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
       addSpatialQueryLayers(map, spatialModeRef.current)
       addIsochroneLayers(map, (routingModeActiveRef.current && routingModeRef.current === 'isochrone') || Boolean(emergencyModeActiveRef.current && emergencyResultRef.current))
       addRoutingLayers(map, routingModeActiveRef.current)
       addEmergencyLayers(map, emergencyModeActiveRef.current)
+      addLivingCircleLayers(map, livingCircleModeActiveRef.current)
       setSpatialQueryData(
         map,
         queryCenterRef.current,
@@ -481,6 +542,8 @@ export default function CityMap({
         isochroneResultRef.current,
       )
       setEmergencyData(map, incidentRef.current, emergencyResultRef.current)
+      setLivingCircleData(map, livingCircleOriginRef.current, livingCircleResultRef.current)
+      setLivingCircleCategoryFilter(map, livingCircleCategoriesRef.current)
       if (emergencyModeActiveRef.current && emergencyResultRef.current) {
         setIsochroneData(map, emergencyResultRef.current.response_isochrones)
       } else {
@@ -503,6 +566,18 @@ export default function CityMap({
     }
     const handleClick = (event: MapMouseEvent) => {
       popupRef.current?.remove()
+      if (livingCircleModeActiveRef.current) {
+        const feature = map.queryRenderedFeatures(event.point, { layers: [LIVING_POI_LAYER_ID] })[0]
+        if (feature?.properties) {
+          popupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 12 })
+            .setLngLat(event.lngLat)
+            .setDOMContent(createLivingCirclePopupContent(feature.properties as LivingCircleMapProperties))
+            .addTo(map)
+          return
+        }
+        selectLivingCircleOriginRef.current({ lon: event.lngLat.lng, lat: event.lngLat.lat })
+        return
+      }
       if (emergencyModeActiveRef.current) {
         const feature = map.queryRenderedFeatures(event.point, {
           layers: [EMERGENCY_FACILITY_LAYER_ID, EMERGENCY_ROUTE_LAYER_ID],
@@ -567,7 +642,7 @@ export default function CityMap({
         .addTo(map)
     }
     const handlePoiClick = (event: MapLayerMouseEvent) => {
-      if (spatialModeRef.current || routingModeActiveRef.current || emergencyModeActiveRef.current) return
+      if (spatialModeRef.current || routingModeActiveRef.current || emergencyModeActiveRef.current || livingCircleModeActiveRef.current) return
       const poiFeature = event.features?.[0]
       if (!poiFeature?.properties) return
       popupRef.current?.remove()

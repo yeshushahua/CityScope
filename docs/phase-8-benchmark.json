@@ -1,0 +1,949 @@
+{
+  "generated_at": "2026-09-09T02:50:06.029525+00:00",
+  "cases": [
+    {
+      "name": "中心城区",
+      "origin": {
+        "lon": 103.8343,
+        "lat": 36.0611
+      },
+      "snap_distance_m": 39.4,
+      "origin_connector_time_s": 29.5,
+      "node_counts": {
+        "5": 32,
+        "10": 179,
+        "15": 412
+      },
+      "area_15min_km2": 1.5102,
+      "reachable_poi_count": 46,
+      "categories": {
+        "commercial": 4,
+        "healthcare": 2,
+        "education": 5,
+        "recreation": 4,
+        "transport": 31
+      },
+      "covered_categories": 5,
+      "coverage_ratio": 1.0,
+      "timings": {
+        "origin_snapping_ms": 3.222,
+        "pgr_driving_distance_ms": 45.439,
+        "poi_reachable_join_ms": 1.807,
+        "geometry_construction_ms": 142.894,
+        "api_total_ms": 196.498
+      }
+    },
+    {
+      "name": "七里河",
+      "origin": {
+        "lon": 103.77,
+        "lat": 36.06
+      },
+      "snap_distance_m": 15.7,
+      "origin_connector_time_s": 11.7,
+      "node_counts": {
+        "5": 19,
+        "10": 56,
+        "15": 119
+      },
+      "area_15min_km2": 1.0642,
+      "reachable_poi_count": 20,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 3,
+        "recreation": 3,
+        "transport": 14
+      },
+      "covered_categories": 3,
+      "coverage_ratio": 0.6,
+      "timings": {
+        "origin_snapping_ms": 1.445,
+        "pgr_driving_distance_ms": 28.614,
+        "poi_reachable_join_ms": 1.734,
+        "geometry_construction_ms": 111.066,
+        "api_total_ms": 149.003
+      }
+    },
+    {
+      "name": "安宁",
+      "origin": {
+        "lon": 103.72,
+        "lat": 36.1
+      },
+      "snap_distance_m": 54.9,
+      "origin_connector_time_s": 41.1,
+      "node_counts": {
+        "5": 27,
+        "10": 109,
+        "15": 290
+      },
+      "area_15min_km2": 1.6476,
+      "reachable_poi_count": 24,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 1,
+        "education": 1,
+        "recreation": 2,
+        "transport": 20
+      },
+      "covered_categories": 4,
+      "coverage_ratio": 0.8,
+      "timings": {
+        "origin_snapping_ms": 1.851,
+        "pgr_driving_distance_ms": 34.071,
+        "poi_reachable_join_ms": 1.74,
+        "geometry_construction_ms": 40.94,
+        "api_total_ms": 85.19
+      }
+    },
+    {
+      "name": "东部",
+      "origin": {
+        "lon": 103.93,
+        "lat": 36.05
+      },
+      "snap_distance_m": 17.0,
+      "origin_connector_time_s": 12.7,
+      "node_counts": {
+        "5": 2,
+        "10": 13,
+        "15": 27
+      },
+      "area_15min_km2": 0.3346,
+      "reachable_poi_count": 1,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 1
+      },
+      "covered_categories": 1,
+      "coverage_ratio": 0.2,
+      "timings": {
+        "origin_snapping_ms": 1.94,
+        "pgr_driving_distance_ms": 29.012,
+        "poi_reachable_join_ms": 1.841,
+        "geometry_construction_ms": 7.985,
+        "api_total_ms": 45.571
+      }
+    },
+    {
+      "name": "西部",
+      "origin": {
+        "lon": 103.65,
+        "lat": 36.08
+      },
+      "snap_distance_m": 44.6,
+      "origin_connector_time_s": 33.4,
+      "node_counts": {
+        "5": 10,
+        "10": 25,
+        "15": 73
+      },
+      "area_15min_km2": 1.3374,
+      "reachable_poi_count": 3,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 3
+      },
+      "covered_categories": 1,
+      "coverage_ratio": 0.2,
+      "timings": {
+        "origin_snapping_ms": 1.834,
+        "pgr_driving_distance_ms": 30.612,
+        "poi_reachable_join_ms": 1.709,
+        "geometry_construction_ms": 28.181,
+        "api_total_ms": 69.46
+      }
+    },
+    {
+      "name": "南部边缘",
+      "origin": {
+        "lon": 103.8242,
+        "lat": 35.9932
+      },
+      "snap_distance_m": 21.2,
+      "origin_connector_time_s": 15.9,
+      "node_counts": {
+        "5": 1,
+        "10": 2,
+        "15": 16
+      },
+      "area_15min_km2": 0.1706,
+      "reachable_poi_count": 1,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 1
+      },
+      "covered_categories": 1,
+      "coverage_ratio": 0.2,
+      "timings": {
+        "origin_snapping_ms": 0.982,
+        "pgr_driving_distance_ms": 28.818,
+        "poi_reachable_join_ms": 2.04,
+        "geometry_construction_ms": 5.289,
+        "api_total_ms": 40.739
+      }
+    },
+    {
+      "name": "北部边缘",
+      "origin": {
+        "lon": 103.8325,
+        "lat": 36.147
+      },
+      "snap_distance_m": 29.9,
+      "origin_connector_time_s": 22.4,
+      "node_counts": {
+        "5": 4,
+        "10": 7,
+        "15": 8
+      },
+      "area_15min_km2": 0.2437,
+      "reachable_poi_count": 0,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 0
+      },
+      "covered_categories": 0,
+      "coverage_ratio": 0.0,
+      "timings": {
+        "origin_snapping_ms": 1.183,
+        "pgr_driving_distance_ms": 29.073,
+        "poi_reachable_join_ms": 1.379,
+        "geometry_construction_ms": 5.016,
+        "api_total_ms": 39.489
+      }
+    },
+    {
+      "name": "东部边界",
+      "origin": {
+        "lon": 104.0595,
+        "lat": 36.08
+      },
+      "snap_distance_m": 30.7,
+      "origin_connector_time_s": 23.0,
+      "node_counts": {
+        "5": 1,
+        "10": 1,
+        "15": 1
+      },
+      "area_15min_km2": 0.0013,
+      "reachable_poi_count": 0,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 0
+      },
+      "covered_categories": 0,
+      "coverage_ratio": 0.0,
+      "timings": {
+        "origin_snapping_ms": 1.055,
+        "pgr_driving_distance_ms": 33.101,
+        "poi_reachable_join_ms": 1.474,
+        "geometry_construction_ms": 2.728,
+        "api_total_ms": 36.395
+      }
+    },
+    {
+      "name": "西部边界",
+      "origin": {
+        "lon": 103.61,
+        "lat": 36.07
+      },
+      "snap_distance_m": 127.3,
+      "origin_connector_time_s": 95.5,
+      "node_counts": {
+        "5": 5,
+        "10": 8,
+        "15": 16
+      },
+      "area_15min_km2": 0.2264,
+      "reachable_poi_count": 0,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 0
+      },
+      "covered_categories": 0,
+      "coverage_ratio": 0.0,
+      "timings": {
+        "origin_snapping_ms": 0.979,
+        "pgr_driving_distance_ms": 28.117,
+        "poi_reachable_join_ms": 1.44,
+        "geometry_construction_ms": 5.996,
+        "api_total_ms": 43.068
+      }
+    },
+    {
+      "name": "东北边缘",
+      "origin": {
+        "lon": 104.0197,
+        "lat": 36.1485
+      },
+      "snap_distance_m": 18.5,
+      "origin_connector_time_s": 13.9,
+      "node_counts": {
+        "5": 2,
+        "10": 3,
+        "15": 8
+      },
+      "area_15min_km2": 0.2931,
+      "reachable_poi_count": 0,
+      "categories": {
+        "commercial": 0,
+        "healthcare": 0,
+        "education": 0,
+        "recreation": 0,
+        "transport": 0
+      },
+      "covered_categories": 0,
+      "coverage_ratio": 0.0,
+      "timings": {
+        "origin_snapping_ms": 0.953,
+        "pgr_driving_distance_ms": 24.693,
+        "poi_reachable_join_ms": 1.306,
+        "geometry_construction_ms": 4.392,
+        "api_total_ms": 40.049
+      }
+    }
+  ],
+  "timing_summary_ms": {
+    "origin_snapping_ms": {
+      "average": 1.544,
+      "min": 0.953,
+      "max": 3.222
+    },
+    "pgr_driving_distance_ms": {
+      "average": 31.155,
+      "min": 24.693,
+      "max": 45.439
+    },
+    "poi_reachable_join_ms": {
+      "average": 1.647,
+      "min": 1.306,
+      "max": 2.04
+    },
+    "geometry_construction_ms": {
+      "average": 35.449,
+      "min": 2.728,
+      "max": 142.894
+    },
+    "api_total_ms": {
+      "average": 74.546,
+      "min": 36.395,
+      "max": 196.498
+    }
+  },
+  "graph_quality": {
+    "nodes": 23195,
+    "edges": 59542,
+    "total_directed_edge_length_m": 8505806.745352196,
+    "null_endpoints": 0,
+    "invalid_geometry": 0,
+    "wrong_srid": 0,
+    "invalid_costs": 0,
+    "topology_sample_size": 100,
+    "topology_max_start_error_m": 0.0,
+    "topology_max_end_error_m": 0.0,
+    "weak_components": {
+      "components": 272,
+      "largest": 22151,
+      "largest_ratio": 0.9549902996335418
+    },
+    "strong_components": {
+      "components": 272,
+      "largest": 22151,
+      "largest_ratio": 0.9549902996335418
+    },
+    "highway_counts": [
+      {
+        "highway": "service",
+        "count": 17240
+      },
+      {
+        "highway": "residential",
+        "count": 11562
+      },
+      {
+        "highway": "tertiary",
+        "count": 5356
+      },
+      {
+        "highway": "footway",
+        "count": 4374
+      },
+      {
+        "highway": "secondary",
+        "count": 4342
+      },
+      {
+        "highway": "unclassified",
+        "count": 3538
+      },
+      {
+        "highway": "primary",
+        "count": 2666
+      },
+      {
+        "highway": "path",
+        "count": 2660
+      },
+      {
+        "highway": "trunk",
+        "count": 1780
+      },
+      {
+        "highway": "pedestrian",
+        "count": 1278
+      },
+      {
+        "highway": "living_street",
+        "count": 880
+      },
+      {
+        "highway": "steps",
+        "count": 814
+      },
+      {
+        "highway": "primary_link",
+        "count": 564
+      },
+      {
+        "highway": "track",
+        "count": 490
+      },
+      {
+        "highway": "steps; footway",
+        "count": 428
+      },
+      {
+        "highway": "trunk_link",
+        "count": 360
+      },
+      {
+        "highway": "service; residential",
+        "count": 172
+      },
+      {
+        "highway": "secondary_link",
+        "count": 148
+      },
+      {
+        "highway": "steps; path",
+        "count": 104
+      },
+      {
+        "highway": "unclassified; residential",
+        "count": 78
+      },
+      {
+        "highway": "service; path",
+        "count": 68
+      },
+      {
+        "highway": "service; unclassified",
+        "count": 66
+      },
+      {
+        "highway": "service; footway",
+        "count": 50
+      },
+      {
+        "highway": "track; unclassified",
+        "count": 36
+      },
+      {
+        "highway": "footway; path",
+        "count": 28
+      },
+      {
+        "highway": "busway",
+        "count": 24
+      },
+      {
+        "highway": "track; residential",
+        "count": 22
+      },
+      {
+        "highway": "tertiary_link",
+        "count": 22
+      },
+      {
+        "highway": "pedestrian; steps",
+        "count": 20
+      },
+      {
+        "highway": "service; track",
+        "count": 20
+      },
+      {
+        "highway": "pedestrian; path",
+        "count": 18
+      },
+      {
+        "highway": "steps; pedestrian",
+        "count": 16
+      },
+      {
+        "highway": "service; tertiary",
+        "count": 16
+      },
+      {
+        "highway": "tertiary; residential",
+        "count": 16
+      },
+      {
+        "highway": "track; path",
+        "count": 16
+      },
+      {
+        "highway": "pedestrian; service",
+        "count": 16
+      },
+      {
+        "highway": "primary_link; primary",
+        "count": 14
+      },
+      {
+        "highway": "secondary; primary",
+        "count": 14
+      },
+      {
+        "highway": "trunk; trunk_link",
+        "count": 12
+      },
+      {
+        "highway": "pedestrian; footway",
+        "count": 12
+      },
+      {
+        "highway": "steps; footway; path",
+        "count": 10
+      },
+      {
+        "highway": "secondary; tertiary",
+        "count": 10
+      },
+      {
+        "highway": "living_street; residential",
+        "count": 10
+      },
+      {
+        "highway": "pedestrian; residential",
+        "count": 10
+      },
+      {
+        "highway": "trunk; primary",
+        "count": 10
+      },
+      {
+        "highway": "steps; service",
+        "count": 10
+      },
+      {
+        "highway": "tertiary; unclassified",
+        "count": 10
+      },
+      {
+        "highway": "unclassified; path",
+        "count": 8
+      },
+      {
+        "highway": "residential; path",
+        "count": 7
+      },
+      {
+        "highway": "path; residential",
+        "count": 7
+      },
+      {
+        "highway": "steps; pedestrian; footway",
+        "count": 7
+      },
+      {
+        "highway": "footway; residential",
+        "count": 6
+      },
+      {
+        "highway": "steps; service; footway",
+        "count": 6
+      },
+      {
+        "highway": "steps; service; path",
+        "count": 6
+      },
+      {
+        "highway": "pedestrian; steps; footway",
+        "count": 5
+      },
+      {
+        "highway": "steps; residential",
+        "count": 4
+      },
+      {
+        "highway": "steps; footway; residential",
+        "count": 4
+      },
+      {
+        "highway": "service; living_street",
+        "count": 4
+      },
+      {
+        "highway": "service; secondary",
+        "count": 4
+      },
+      {
+        "highway": "tertiary; track",
+        "count": 4
+      },
+      {
+        "highway": "escape",
+        "count": 4
+      },
+      {
+        "highway": "steps; tertiary",
+        "count": 4
+      },
+      {
+        "highway": "service; path; residential",
+        "count": 2
+      },
+      {
+        "highway": "steps; track",
+        "count": 2
+      },
+      {
+        "highway": "steps; unclassified",
+        "count": 2
+      },
+      {
+        "highway": "service; footway; residential",
+        "count": 2
+      },
+      {
+        "highway": "tertiary; primary",
+        "count": 2
+      },
+      {
+        "highway": "secondary; unclassified",
+        "count": 2
+      },
+      {
+        "highway": "service; track; unclassified; residential",
+        "count": 2
+      },
+      {
+        "highway": "steps; footway; tertiary",
+        "count": 2
+      },
+      {
+        "highway": "steps; footway; unclassified",
+        "count": 2
+      },
+      {
+        "highway": "service; track; residential",
+        "count": 2
+      },
+      {
+        "highway": "service; track; path",
+        "count": 2
+      },
+      {
+        "highway": "service; residential; path",
+        "count": 2
+      },
+      {
+        "highway": "service; primary_link",
+        "count": 2
+      },
+      {
+        "highway": "ladder",
+        "count": 2
+      },
+      {
+        "highway": "footway; unclassified",
+        "count": 2
+      },
+      {
+        "highway": "footway; tertiary",
+        "count": 2
+      },
+      {
+        "highway": "unclassified; primary",
+        "count": 2
+      },
+      {
+        "highway": "secondary; secondary_link",
+        "count": 2
+      },
+      {
+        "highway": "primary; unclassified",
+        "count": 2
+      },
+      {
+        "highway": "pedestrian; secondary",
+        "count": 2
+      },
+      {
+        "highway": "pedestrian; living_street",
+        "count": 2
+      },
+      {
+        "highway": "living_street; tertiary",
+        "count": 2
+      },
+      {
+        "highway": "trunk_link; primary_link",
+        "count": 2
+      },
+      {
+        "highway": "ladder; service",
+        "count": 2
+      },
+      {
+        "highway": "tertiary_link; primary_link",
+        "count": 1
+      },
+      {
+        "highway": "pedestrian; steps; path",
+        "count": 1
+      },
+      {
+        "highway": "steps; pedestrian; path",
+        "count": 1
+      },
+      {
+        "highway": "primary_link; tertiary_link",
+        "count": 1
+      }
+    ]
+  },
+  "poi_walk_access": {
+    "total": 2308,
+    "mapped": 2303,
+    "unmapped": 5,
+    "average_snap_distance_m": 46.081871589448546,
+    "maximum_snap_distance_m": 269.98143538,
+    "by_category": [
+      {
+        "category": "commercial",
+        "total": 176,
+        "mapped": 176,
+        "unmapped": 0,
+        "average_snap_distance_m": 45.296888804261386,
+        "maximum_snap_distance_m": 155.60403895
+      },
+      {
+        "category": "education",
+        "total": 378,
+        "mapped": 377,
+        "unmapped": 1,
+        "average_snap_distance_m": 69.73643042673746,
+        "maximum_snap_distance_m": 269.98143538
+      },
+      {
+        "category": "emergency",
+        "total": 4,
+        "mapped": 4,
+        "unmapped": 0,
+        "average_snap_distance_m": 45.557415107500006,
+        "maximum_snap_distance_m": 92.15206209
+      },
+      {
+        "category": "healthcare",
+        "total": 102,
+        "mapped": 102,
+        "unmapped": 0,
+        "average_snap_distance_m": 43.03227480058822,
+        "maximum_snap_distance_m": 130.70646473
+      },
+      {
+        "category": "public_safety",
+        "total": 48,
+        "mapped": 48,
+        "unmapped": 0,
+        "average_snap_distance_m": 35.90352920041666,
+        "maximum_snap_distance_m": 129.71827241
+      },
+      {
+        "category": "recreation",
+        "total": 176,
+        "mapped": 176,
+        "unmapped": 0,
+        "average_snap_distance_m": 62.10790515357954,
+        "maximum_snap_distance_m": 245.98512225
+      },
+      {
+        "category": "transport",
+        "total": 1424,
+        "mapped": 1420,
+        "unmapped": 4,
+        "average_snap_distance_m": 38.47731068403523,
+        "maximum_snap_distance_m": 239.85660908
+      }
+    ]
+  },
+  "concave_hull_parameter": {
+    "selected": 0.85,
+    "reason": "valid single-part center geometries with more network detail than 0.90",
+    "center_comparison": [
+      {
+        "pct": 0.7,
+        "sec": 300,
+        "area_km2": 0.0693664117044782,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.7,
+        "sec": 600,
+        "area_km2": 0.5420088792354544,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.7,
+        "sec": 900,
+        "area_km2": 1.3675387439111606,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.8,
+        "sec": 300,
+        "area_km2": 0.06880997176591828,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.8,
+        "sec": 600,
+        "area_km2": 0.5085833259133579,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.8,
+        "sec": 900,
+        "area_km2": 1.3787410158371893,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.85,
+        "sec": 300,
+        "area_km2": 0.06798747192560117,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.85,
+        "sec": 600,
+        "area_km2": 0.5419567256076852,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.85,
+        "sec": 900,
+        "area_km2": 1.5096639936473912,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.9,
+        "sec": 300,
+        "area_km2": 0.06881485219617711,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.9,
+        "sec": 600,
+        "area_km2": 0.5358449356085626,
+        "valid": true,
+        "parts": 1
+      },
+      {
+        "pct": 0.9,
+        "sec": 900,
+        "area_km2": 1.5096639936473912,
+        "valid": true,
+        "parts": 1
+      }
+    ]
+  },
+  "explain_analyze_buffers": {
+    "origin_snap": [
+      "Limit  (cost=0.40..910.44 rows=1 width=16) (actual time=0.034..0.035 rows=1 loops=1)",
+      "  Buffers: shared hit=7",
+      "  ->  Index Scan using idx_pedestrian_nodes_geography on pedestrian_nodes n  (cost=0.40..1820.47 rows=2 width=16) (actual time=0.034..0.034 rows=1 loops=1)",
+      "        Index Cond: ((geometry)::geography && _st_expand('0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '300'::double precision))",
+      "        Order By: ((geometry)::geography <-> '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography)",
+      "        Filter: st_dwithin((geometry)::geography, '0101000020E610000061C3D32B65F559408FE4F21FD2074240'::geography, '300'::double precision, true)",
+      "        Buffers: shared hit=7",
+      "Planning Time: 0.200 ms",
+      "Execution Time: 0.042 ms"
+    ],
+    "poi_walk_access": [
+      "Index Scan using ix_poi_walk_access_node_id on poi_walk_access  (cost=0.28..8.30 rows=1 width=32) (actual time=0.013..0.013 rows=0 loops=1)",
+      "  Index Cond: (node_id = '4077238576'::bigint)",
+      "  Buffers: shared hit=2",
+      "Planning:",
+      "  Buffers: shared hit=3",
+      "Planning Time: 0.031 ms",
+      "Execution Time: 0.017 ms"
+    ],
+    "reachable_poi_join": [
+      "Aggregate  (cost=237.43..237.44 rows=1 width=8) (actual time=36.956..36.958 rows=1 loops=1)",
+      "  Buffers: shared hit=2274",
+      "  CTE d",
+      "    ->  Function Scan on pgr_drivingdistance  (cost=0.25..10.25 rows=1000 width=16) (actual time=36.370..36.389 rows=449 loops=1)",
+      "          Buffers: shared hit=2248",
+      "  ->  Hash Join  (cost=168.57..224.11 rows=1230 width=0) (actual time=36.873..36.953 rows=55 loops=1)",
+      "        Hash Cond: (a.poi_id = p.id)",
+      "        Buffers: shared hit=2274",
+      "        ->  Hash Join  (cost=68.82..121.12 rows=1230 width=8) (actual time=36.630..36.705 rows=55 loops=1)",
+      "              Hash Cond: (d.node = a.node_id)",
+      "              Buffers: shared hit=2265",
+      "              ->  CTE Scan on d  (cost=0.00..20.00 rows=1000 width=8) (actual time=36.371..36.426 rows=449 loops=1)",
+      "                    Buffers: shared hit=2248",
+      "              ->  Hash  (cost=40.03..40.03 rows=2303 width=16) (actual time=0.247..0.248 rows=2303 loops=1)",
+      "                    Buckets: 4096  Batches: 1  Memory Usage: 140kB",
+      "                    Buffers: shared hit=17",
+      "                    ->  Seq Scan on poi_walk_access a  (cost=0.00..40.03 rows=2303 width=16) (actual time=0.009..0.120 rows=2303 loops=1)",
+      "                          Buffers: shared hit=17",
+      "        ->  Hash  (cost=70.90..70.90 rows=2308 width=8) (actual time=0.240..0.240 rows=2308 loops=1)",
+      "              Buckets: 4096  Batches: 1  Memory Usage: 123kB",
+      "              Buffers: shared hit=9",
+      "              ->  Index Only Scan using pois_pkey on pois p  (cost=0.28..70.90 rows=2308 width=8) (actual time=0.011..0.110 rows=2308 loops=1)",
+      "                    Heap Fetches: 0",
+      "                    Buffers: shared hit=9",
+      "Planning:",
+      "  Buffers: shared hit=12",
+      "Planning Time: 0.112 ms",
+      "Execution Time: 36.975 ms"
+    ],
+    "pgr_driving_distance": [
+      "Function Scan on pgr_drivingdistance  (cost=0.25..10.25 rows=1000 width=64) (actual time=38.124..38.136 rows=449 loops=1)",
+      "  Buffers: shared hit=2248",
+      "Planning Time: 0.022 ms",
+      "Execution Time: 38.170 ms"
+    ]
+  }
+}
