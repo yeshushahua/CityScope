@@ -51,4 +51,6 @@ SOURCE_TAG_COLUMNS = (
     "public_transport",
     "shop",
     "building",
+    "height",
+    "building:levels",
 )

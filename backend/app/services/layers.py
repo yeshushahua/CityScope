@@ -80,6 +80,7 @@ def query_buildings(
         text(
             """
             SELECT id, osm_type, osm_id, name, building_type, area_m2,
+                   osm_height_m, building_levels, display_height_m, height_source,
                    ST_AsGeoJSON(geometry)::json AS geometry
             FROM buildings
             WHERE ST_Intersects(
@@ -103,6 +104,10 @@ def query_buildings(
                     "name": row["name"],
                     "building_type": row["building_type"],
                     "area_m2": round(row["area_m2"], 2),
+                    "osm_height_m": row["osm_height_m"],
+                    "building_levels": row["building_levels"],
+                    "display_height_m": row["display_height_m"],
+                    "height_source": row["height_source"],
                     "source": "OpenStreetMap",
                 },
             )

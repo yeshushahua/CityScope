@@ -1,6 +1,7 @@
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 import type { GeoJSONSource, Map } from 'maplibre-gl'
 import type { IsochroneProperties, IsochroneResponse } from '../../../types/routing'
+import { ISOCHRONE_COLORS } from '../../../config/visualization'
 
 export const ISOCHRONE_SOURCE_ID = 'cityscope-isochrones'
 export const ISOCHRONE_FILL_15_ID = 'cityscope-isochrone-fill-15'
@@ -13,9 +14,9 @@ const EMPTY: FeatureCollection<Polygon | MultiPolygon, IsochroneProperties> = {
 }
 
 const BANDS = [
-  { minutes: 15, fill: '#4b76c5', opacity: 0.19 },
-  { minutes: 10, fill: '#2a9d8f', opacity: 0.24 },
-  { minutes: 5, fill: '#f2a93b', opacity: 0.32 },
+  { minutes: 15, fill: ISOCHRONE_COLORS[15], opacity: 0.16 },
+  { minutes: 10, fill: ISOCHRONE_COLORS[10], opacity: 0.2 },
+  { minutes: 5, fill: ISOCHRONE_COLORS[5], opacity: 0.27 },
 ] as const
 
 export function addIsochroneLayers(map: Map, visible: boolean): void {

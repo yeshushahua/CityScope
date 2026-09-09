@@ -1,5 +1,6 @@
 import type { EmergencyResponse, EmergencyStatus, IncidentType } from '../../types/emergency'
 import type { QueryCenter } from '../../types/spatial'
+import { formatArea, formatCoordinate, formatCount, formatDistance, formatDuration } from '../../utils/format'
 
 interface EmergencyPanelProps {
   incidentType: IncidentType
@@ -47,24 +48,24 @@ export default function EmergencyPanel({
 
       <div className="incident-row">
         <span>事件位置</span>
-        <b>{incident ? `${incident.lon.toFixed(5)}, ${incident.lat.toFixed(5)}` : '待选择'}</b>
+        <b>{incident ? `${formatCoordinate(incident.lon)}, ${formatCoordinate(incident.lat)}` : '待选择'}</b>
       </div>
       <p className={`emergency-message is-${status}`} role="status" aria-live="polite">{STATUS_TEXT[status]}</p>
 
       {result && status === 'success' && (
         <>
           <div className="emergency-metrics">
-            <div><span>事件吸附</span><strong>{result.incident_snap.snap_distance_m.toFixed(0)} m</strong></div>
-            <div><span>预计响应</span><strong>{result.response_route.properties.response_time_min.toFixed(2)} min</strong></div>
-            <div><span>道路距离</span><strong>{(result.response_route.properties.network_distance_m / 1000).toFixed(2)} km</strong></div>
-            <div><span>道路边数</span><strong>{result.response_route.properties.edge_count}</strong></div>
+            <div><span>事件吸附</span><strong>{formatDistance(result.incident_snap.snap_distance_m)}</strong></div>
+            <div><span>预计响应</span><strong>{formatDuration(result.response_route.properties.response_time_s)}</strong></div>
+            <div><span>道路距离</span><strong>{formatDistance(result.response_route.properties.network_distance_m)}</strong></div>
+            <div><span>道路边数</span><strong>{formatCount(result.response_route.properties.edge_count)}</strong></div>
           </div>
 
           <div className="responder-best">
             <span>推荐响应设施</span>
             <strong>{result.recommended_facility.name || '未命名设施'}</strong>
             <small>{result.recommended_facility.category} / {result.recommended_facility.subcategory}</small>
-            <small>设施 → 事件点 · {result.recommended_facility.response_time_min.toFixed(2)} min</small>
+            <small>设施 → 事件点 · {formatDuration(result.recommended_facility.response_time_s)}</small>
           </div>
 
           {!result.comparison.straight_nearest_is_network_best && (
@@ -74,8 +75,8 @@ export default function EmergencyPanel({
           <div className="responder-list">
             {result.candidate_facilities.map((candidate) => (
               <button key={candidate.poi_id} type="button" onClick={() => onFocus(candidate.lon, candidate.lat)}>
-                <span><b>#{candidate.network_rank} {candidate.name || '未命名设施'}</b><small>直线 {candidate.straight_distance_m.toFixed(0)} m</small></span>
-                <strong>{candidate.response_time_min.toFixed(2)} min</strong>
+                <span><b>#{candidate.network_rank} {candidate.name || '未命名设施'}</b><small>直线 {formatDistance(candidate.straight_distance_m)}</small></span>
+                <strong>{formatDuration(candidate.response_time_s)}</strong>
               </button>
             ))}
           </div>
@@ -84,13 +85,13 @@ export default function EmergencyPanel({
             {result.response_isochrones.features.map((feature) => (
               <div className={`response-band is-${feature.properties.minutes}`} key={feature.properties.minutes}>
                 <strong>{feature.properties.minutes}分钟</strong>
-                <span>{feature.properties.reachable_node_count.toLocaleString()}节点</span>
-                <b>{feature.properties.area_km2.toFixed(2)} km²</b>
+                <span>{formatCount(feature.properties.reachable_node_count)} 节点</span>
+                <b>{formatArea(feature.properties.area_m2)}</b>
               </div>
             ))}
           </div>
           <p className="facility-statistics">设施 {result.facility_statistics.total} · 已映射 {result.facility_statistics.mapped} · 可达 {result.facility_statistics.reachable} · 不可达 {result.facility_statistics.unreachable}</p>
-          <p className="emergency-disclaimer">基于静态有向道路网络估算，不代表实时出警时间。</p>
+          <p className="model-note"><strong>模型说明</strong>基于静态有向道路网络，用于空间决策演示，不代表真实出警时间。</p>
         </>
       )}
 

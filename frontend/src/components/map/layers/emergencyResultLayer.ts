@@ -2,6 +2,7 @@ import type { Feature, FeatureCollection, LineString, Point } from 'geojson'
 import type { GeoJSONSource, Map } from 'maplibre-gl'
 import type { EmergencyResponse } from '../../../types/emergency'
 import type { QueryCenter } from '../../../types/spatial'
+import { MAP_COLORS } from '../../../config/visualization'
 
 export const EMERGENCY_SOURCE_ID = 'cityscope-emergency-result'
 export const EMERGENCY_ROUTE_LAYER_ID = 'cityscope-emergency-route'
@@ -75,30 +76,30 @@ export function addEmergencyLayers(map: Map, visible: boolean): void {
   map.addLayer({
     id: 'cityscope-emergency-connectors', type: 'line', source: EMERGENCY_SOURCE_ID,
     filter: ['==', ['get', 'kind'], 'connector'], layout: { visibility },
-    paint: { 'line-color': '#6d7e79', 'line-width': 2, 'line-dasharray': [2, 2] },
+    paint: { 'line-color': MAP_COLORS.connector, 'line-width': 2, 'line-dasharray': [2, 2] },
   })
   map.addLayer({
     id: EMERGENCY_ROUTE_LAYER_ID, type: 'line', source: EMERGENCY_SOURCE_ID,
     filter: ['==', ['get', 'kind'], 'response-route'],
     layout: { visibility, 'line-cap': 'round', 'line-join': 'round' },
-    paint: { 'line-color': '#c94235', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 4, 15, 8], 'line-opacity': 0.96 },
+    paint: { 'line-color': MAP_COLORS.emergencyRoute, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 4, 15, 8], 'line-opacity': 0.96 },
   })
   map.addLayer({
     id: 'cityscope-emergency-route-arrows', type: 'symbol', source: EMERGENCY_SOURCE_ID,
     filter: ['==', ['get', 'kind'], 'response-route'],
     layout: {
       visibility, 'symbol-placement': 'line', 'symbol-spacing': 85,
-      'text-field': '▶', 'text-size': 12, 'text-rotation-alignment': 'map',
+      'text-field': '>', 'text-size': 12, 'text-rotation-alignment': 'map',
       'text-keep-upright': false, 'text-allow-overlap': true,
     },
-    paint: { 'text-color': '#ffffff', 'text-halo-color': '#c94235', 'text-halo-width': 1 },
+    paint: { 'text-color': '#ffffff', 'text-halo-color': MAP_COLORS.emergencyRoute, 'text-halo-width': 1 },
   })
   map.addLayer({
     id: 'cityscope-emergency-points', type: 'circle', source: EMERGENCY_SOURCE_ID,
     filter: ['in', ['get', 'kind'], ['literal', ['incident', 'incident-snap']]], layout: { visibility },
     paint: {
       'circle-radius': ['match', ['get', 'kind'], 'incident', 10, 4],
-      'circle-color': ['match', ['get', 'kind'], 'incident', '#c94235', '#708680'],
+      'circle-color': ['match', ['get', 'kind'], 'incident', MAP_COLORS.destination, '#708680'],
       'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5,
     },
   })
@@ -107,7 +108,7 @@ export function addEmergencyLayers(map: Map, visible: boolean): void {
     filter: ['in', ['get', 'kind'], ['literal', ['recommended', 'candidate']]], layout: { visibility },
     paint: {
       'circle-radius': ['match', ['get', 'kind'], 'recommended', 11, 7],
-      'circle-color': ['match', ['get', 'kind'], 'recommended', '#176b5d', '#d19a39'],
+      'circle-color': ['match', ['get', 'kind'], 'recommended', MAP_COLORS.responder, MAP_COLORS.candidate],
       'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5,
     },
   })

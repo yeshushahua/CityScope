@@ -17,6 +17,10 @@ export interface BuildingProperties {
   name: string | null
   building_type: string | null
   area_m2: number
+  osm_height_m: number | null
+  building_levels: number | null
+  display_height_m: number | null
+  height_source: 'osm_height' | 'levels_estimate' | 'unknown'
   source: string
 }
 

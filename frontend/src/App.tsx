@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { isAxiosError } from 'axios'
-import CityMap from './components/map/CityMap'
 import Header from './components/layout/Header'
 import Sidebar, { type LayerVisibility, type ModuleId } from './components/layout/Sidebar'
 import {
@@ -38,14 +37,20 @@ import type {
   LivingCircleStatus,
 } from './types/livingCircle'
 import { LIVING_CIRCLE_CATEGORIES } from './components/livingCircle/LivingCirclePanel'
+import type { MapViewMode } from './types/map'
+
+const CityMap = lazy(() => import('./components/map/CityMap'))
 
 export type ApiStatus = 'checking' | 'online' | 'offline'
 
 export default function App() {
   const [apiStatus, setApiStatus] = useState<ApiStatus>('checking')
   const [activeModule, setActiveModule] = useState<ModuleId>('overview')
-  const [databaseOnline, setDatabaseOnline] = useState(false)
-  const [layers, setLayers] = useState<LayerVisibility>({ pois: true, buildings: false, roads: false })
+  const [databaseStatus, setDatabaseStatus] = useState<ApiStatus>('checking')
+  const [layers, setLayers] = useState<LayerVisibility>({
+    pois: true, buildings: false, roads: false, analysis: true, buildings3d: true,
+  })
+  const [viewMode, setViewMode] = useState<MapViewMode>('2d')
   const [layerCounts, setLayerCounts] = useState<LayerCounts>({ pois: 0, buildings: 0, roads: 0 })
   const [queryCenter, setQueryCenter] = useState<QueryCenter | null>(null)
   const [queryRadiusM, setQueryRadiusM] = useState(1000)
@@ -83,8 +88,8 @@ export default function App() {
         if (active) setApiStatus('offline')
       })
     checkDatabase()
-      .then((online) => { if (active) setDatabaseOnline(online) })
-      .catch(() => { if (active) setDatabaseOnline(false) })
+      .then((online) => { if (active) setDatabaseStatus(online ? 'online' : 'offline') })
+      .catch(() => { if (active) setDatabaseStatus('offline') })
 
     return () => { active = false }
   }, [])
@@ -211,7 +216,10 @@ export default function App() {
     return () => controller.abort()
   }, [activeModule, livingCircleOrigin])
 
-  const selectModule = useCallback((moduleId: ModuleId) => setActiveModule(moduleId), [])
+  const selectModule = useCallback((moduleId: ModuleId) => {
+    setActiveModule(moduleId)
+    setLayers((current) => ({ ...current, analysis: true }))
+  }, [])
   const toggleLayer = useCallback((layer: keyof LayerVisibility) => {
     setLayers((current) => ({ ...current, [layer]: !current[layer] }))
   }, [])
@@ -260,6 +268,12 @@ export default function App() {
     setIncidentType(value)
     setEmergencyResult(null)
   }, [])
+  const changeViewMode = useCallback((mode: MapViewMode) => {
+    setViewMode(mode)
+    if (mode === '3d') {
+      setLayers((current) => ({ ...current, buildings: true, buildings3d: true }))
+    }
+  }, [])
   const clearEmergency = useCallback(() => {
     setIncident(null)
     setEmergencyResult(null)
@@ -283,15 +297,11 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <Header apiStatus={apiStatus} />
+      <Header apiStatus={apiStatus} databaseStatus={databaseStatus} />
       <div className="app-body">
         <Sidebar
           activeModule={activeModule}
           onSelect={selectModule}
-          layers={layers}
-          onToggleLayer={toggleLayer}
-          databaseOnline={databaseOnline}
-          layerCounts={layerCounts}
           queryCenter={queryCenter}
           queryRadiusM={queryRadiusM}
           queryCategory={queryCategory}
@@ -329,8 +339,14 @@ export default function App() {
           onReselectLivingCircle={clearLivingCircle}
         />
         <main className="map-main" aria-label="兰州市地图工作区">
+          <Suspense fallback={<div className="map-loading" role="status"><span className="loading-spinner" aria-hidden="true" />正在加载地图引擎…</div>}>
           <CityMap
             layers={layers}
+            viewMode={viewMode}
+            activeModule={activeModule}
+            onToggleLayer={toggleLayer}
+            onViewModeChange={changeViewMode}
+            layerCounts={layerCounts}
             onLayerCountsChange={setLayerCounts}
             spatialMode={activeModule === 'spatial'}
             queryCenter={queryCenter}
@@ -356,6 +372,7 @@ export default function App() {
             livingCircleCategories={livingCircleCategories}
             onSelectLivingCircleOrigin={selectLivingCircleOrigin}
           />
+          </Suspense>
         </main>
       </div>
     </div>

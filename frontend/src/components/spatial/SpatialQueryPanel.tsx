@@ -4,6 +4,8 @@ import {
   categoryLabel,
   type PoiCategory,
 } from '../../config/poiCategories'
+import DataBars from '../ui/DataBars'
+import { formatArea, formatCoordinate, formatCount, formatDistance } from '../../utils/format'
 import type {
   NearbyPoiCollection,
   QueryCenter,
@@ -43,7 +45,7 @@ export default function SpatialQueryPanel({
         <strong>{center ? '查询中心已选择' : '点击地图选择查询中心'}</strong>
         <span>
           {center
-            ? `${center.lon.toFixed(6)}, ${center.lat.toFixed(6)}`
+            ? `${formatCoordinate(center.lon)}, ${formatCoordinate(center.lat)}`
             : '距离与范围统计由 PostGIS 实时计算'}
         </span>
       </div>
@@ -84,11 +86,11 @@ export default function SpatialQueryPanel({
       {summary && (status === 'success' || status === 'empty') && (
         <>
           <div className="summary-grid" aria-label="范围统计">
-            <div><span>附近 POI</span><strong>{summary.pois.total.toLocaleString()}</strong></div>
-            <div><span>相交建筑</span><strong>{summary.buildings.count.toLocaleString()}</strong></div>
+            <div><span>附近 POI</span><strong>{formatCount(summary.pois.total)}</strong></div>
+            <div><span>相交建筑</span><strong>{formatCount(summary.buildings.count)}</strong></div>
             <div className="summary-wide">
               <span>范围内建筑占地</span>
-              <strong>{Math.round(summary.buildings.footprint_area_m2).toLocaleString()} m²</strong>
+              <strong>{formatArea(summary.buildings.footprint_area_m2)}</strong>
             </div>
           </div>
           <div className="category-summary" aria-label="POI 分类统计">
@@ -100,6 +102,15 @@ export default function SpatialQueryPanel({
               </div>
             ))}
           </div>
+          <DataBars
+            title="POI 类别分布"
+            data={Object.entries(summary.pois.by_category).map(([item, count]) => ({
+              key: item,
+              label: categoryLabel(item),
+              value: count,
+              color: POI_CATEGORY_CONFIG[item as PoiCategory]?.color ?? '#71807c',
+            }))}
+          />
         </>
       )}
 
@@ -122,7 +133,7 @@ export default function SpatialQueryPanel({
                   <strong>{feature.properties.name || '未命名设施'}</strong>
                   <small>{categoryLabel(feature.properties.category)}</small>
                 </span>
-                <b>{Math.round(feature.properties.distance_m)} m</b>
+                <b>{formatDistance(feature.properties.distance_m)}</b>
               </button>
             )
           })}

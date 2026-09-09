@@ -98,12 +98,24 @@ class Building(Base):
     name: Mapped[str | None] = mapped_column(Text)
     building_type: Mapped[str | None] = mapped_column(String(120))
     area_m2: Mapped[float] = mapped_column(Float, nullable=False)
+    osm_height_m: Mapped[float | None] = mapped_column(Float)
+    building_levels: Mapped[float | None] = mapped_column(Float)
+    display_height_m: Mapped[float | None] = mapped_column(Float)
+    height_source: Mapped[str] = mapped_column(String(24), nullable=False, default="unknown")
     geometry: Mapped[Any] = mapped_column(
         Geometry("MULTIPOLYGON", srid=4326, spatial_index=True), nullable=False
     )
 
     __table_args__ = (
         UniqueConstraint("osm_type", "osm_id", name="uq_buildings_osm_identity"),
+        Index("ix_buildings_height_source", "height_source"),
+        CheckConstraint("osm_height_m IS NULL OR osm_height_m > 0", name="ck_buildings_osm_height_positive"),
+        CheckConstraint("building_levels IS NULL OR building_levels > 0", name="ck_buildings_levels_positive"),
+        CheckConstraint("display_height_m IS NULL OR display_height_m > 0", name="ck_buildings_display_height_positive"),
+        CheckConstraint(
+            "height_source IN ('osm_height', 'levels_estimate', 'unknown')",
+            name="ck_buildings_height_source",
+        ),
     )
 
 

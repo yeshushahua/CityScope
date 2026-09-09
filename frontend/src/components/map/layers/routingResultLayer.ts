@@ -2,6 +2,7 @@ import type { Feature, FeatureCollection, LineString, Point } from 'geojson'
 import type { GeoJSONSource, Map } from 'maplibre-gl'
 import type { QueryCenter } from '../../../types/spatial'
 import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../../types/routing'
+import { MAP_COLORS } from '../../../config/visualization'
 
 export const ROUTING_SOURCE_ID = 'cityscope-routing'
 export const ROUTE_LINE_LAYER_ID = 'cityscope-route-line'
@@ -115,7 +116,7 @@ export function addRoutingLayers(map: Map, visible: boolean): void {
     source: ROUTING_SOURCE_ID,
     filter: ['==', ['get', 'kind'], 'connector'],
     layout: { visibility },
-    paint: { 'line-color': '#667f79', 'line-width': 2, 'line-dasharray': [2, 2] },
+    paint: { 'line-color': MAP_COLORS.connector, 'line-width': 2, 'line-dasharray': [2, 2] },
   })
   map.addLayer({
     id: ROUTE_LINE_LAYER_ID,
@@ -123,7 +124,7 @@ export function addRoutingLayers(map: Map, visible: boolean): void {
     source: ROUTING_SOURCE_ID,
     filter: ['==', ['get', 'kind'], 'route'],
     layout: { visibility, 'line-cap': 'round', 'line-join': 'round' },
-    paint: { 'line-color': '#e45b3d', 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 3, 15, 7], 'line-opacity': 0.94 },
+    paint: { 'line-color': MAP_COLORS.route, 'line-width': ['interpolate', ['linear'], ['zoom'], 10, 3, 15, 7], 'line-opacity': 0.94 },
   })
   map.addLayer({
     id: ROUTE_POINT_LAYER_ID,
@@ -133,7 +134,7 @@ export function addRoutingLayers(map: Map, visible: boolean): void {
     layout: { visibility },
     paint: {
       'circle-radius': ['match', ['get', 'kind'], 'snap', 4, 8],
-      'circle-color': ['match', ['get', 'kind'], 'start', '#176b5d', 'end', '#e45b3d', '#7b918b'],
+      'circle-color': ['match', ['get', 'kind'], 'start', MAP_COLORS.origin, 'end', MAP_COLORS.destination, '#7b918b'],
       'circle-stroke-color': '#ffffff',
       'circle-stroke-width': 2,
     },
@@ -146,7 +147,7 @@ export function addRoutingLayers(map: Map, visible: boolean): void {
     layout: { visibility },
     paint: {
       'circle-radius': ['match', ['get', 'kind'], 'best-facility', 10, 7],
-      'circle-color': ['match', ['get', 'kind'], 'best-facility', '#e45b3d', '#d19a39'],
+      'circle-color': ['match', ['get', 'kind'], 'best-facility', MAP_COLORS.destination, MAP_COLORS.candidate],
       'circle-stroke-color': '#ffffff',
       'circle-stroke-width': 2.5,
     },

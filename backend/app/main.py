@@ -10,7 +10,7 @@ from app.api.living_circle import router as living_circle_router
 from app.core.config import settings
 from app.schemas.health import RootResponse
 
-app = FastAPI(title="CityScope API", version="0.8.0")
+app = FastAPI(title="CityScope API", version="0.9.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,

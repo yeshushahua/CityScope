@@ -178,10 +178,30 @@ def clean_buildings(raw: gpd.GeoDataFrame) -> tuple[gpd.GeoDataFrame, CleaningSt
     buildings["building_type"] = buildings.get(
         "building", pd.Series(index=buildings.index, dtype=object)
     ).map(_scalar)
+    height = pd.to_numeric(
+        buildings.get("height", pd.Series(index=buildings.index, dtype=object)),
+        errors="coerce",
+    )
+    levels = pd.to_numeric(
+        buildings.get("building:levels", pd.Series(index=buildings.index, dtype=object)),
+        errors="coerce",
+    )
+    buildings["osm_height_m"] = height.where((height > 0) & (height <= 1000))
+    buildings["building_levels"] = levels.where((levels > 0) & (levels <= 200))
+    buildings["display_height_m"] = buildings["osm_height_m"].combine_first(
+        buildings["building_levels"] * 3.0
+    )
+    buildings["height_source"] = "unknown"
+    buildings.loc[buildings["building_levels"].notna(), "height_source"] = "levels_estimate"
+    buildings.loc[buildings["osm_height_m"].notna(), "height_source"] = "osm_height"
     buildings = gpd.GeoDataFrame(buildings, geometry="geometry", crs=SOURCE_CRS)
     buildings["area_m2"] = buildings.to_crs(AREA_CRS).geometry.area.round(2)
     buildings = buildings[
-        ["osm_type", "osm_id", "name", "building_type", "area_m2", "geometry"]
+        [
+            "osm_type", "osm_id", "name", "building_type", "area_m2",
+            "osm_height_m", "building_levels", "display_height_m", "height_source",
+            "geometry",
+        ]
     ]
     stats = CleaningStats(len(raw), len(buildings), len(raw) - len(buildings))
     return buildings, stats

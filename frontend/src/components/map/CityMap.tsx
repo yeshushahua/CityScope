@@ -6,11 +6,12 @@ import {
   ScaleControl,
   setWorkerUrl,
   type ErrorEvent as MapLibreErrorEvent,
+  type GeoJSONSource,
   type MapLayerMouseEvent,
   type MapMouseEvent,
 } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import type { LayerVisibility } from '../layout/Sidebar'
+import type { LayerVisibility, ModuleId } from '../layout/Sidebar'
 import {
   DEFAULT_BEARING,
   DEFAULT_CENTER,
@@ -18,8 +19,8 @@ import {
   DEFAULT_ZOOM,
   MAP_STYLE_URL,
 } from '../../config/map'
-import type { MapCoordinatesValue, MapLoadStatus } from '../../types/map'
-import type { LayerCounts, PoiProperties, RoadProperties } from '../../types/geojson'
+import type { MapCoordinatesValue, MapLoadStatus, MapViewMode } from '../../types/map'
+import type { BuildingProperties, LayerCounts, PoiProperties, RoadProperties } from '../../types/geojson'
 import type { FocusPoint, NearbyPoiCollection, QueryCenter } from '../../types/spatial'
 import type { IsochroneResponse, NearestFacilityResponse, RoutingMode, ShortestPathResponse } from '../../types/routing'
 import type { EmergencyResponse } from '../../types/emergency'
@@ -29,10 +30,13 @@ import MapCoordinates from './MapCoordinates'
 import MapStatus from './MapStatus'
 import {
   addBuildingLayer,
+  BUILDING_EXTRUSION_LAYER_ID,
+  BUILDING_FILL_LAYER_ID,
   setBuildingData,
+  setBuildingMode,
   setBuildingVisibility,
 } from './layers/buildingLayer'
-import { addPoiLayer, POI_LAYER_ID, setPoiData, setPoiVisibility } from './layers/poiLayer'
+import { addPoiLayer, POI_CLUSTER_LAYER_ID, POI_LAYER_ID, POI_SOURCE_ID, setPoiData, setPoiVisibility } from './layers/poiLayer'
 import {
   addSpatialQueryLayers,
   setSpatialQueryData,
@@ -73,6 +77,9 @@ import {
   setLivingCircleVisibility,
   type LivingCircleMapProperties,
 } from './layers/livingCircleLayer'
+import MapLegend from './MapLegend'
+import MapToolbar from './MapToolbar'
+import { formatArea } from '../../utils/format'
 
 setWorkerUrl(workerUrl)
 
@@ -215,6 +222,29 @@ function createEmergencyPopupContent(properties: EmergencyMapProperties): HTMLEl
   return content
 }
 
+function createBuildingPopupContent(properties: BuildingProperties): HTMLElement {
+  const content = document.createElement('div')
+  content.className = 'coordinate-popup building-popup'
+  const title = document.createElement('strong')
+  title.textContent = properties.name || '未命名建筑'
+  const lines = [
+    `类型：${properties.building_type || '未标注'}`,
+    `占地：${formatArea(properties.area_m2)}`,
+    properties.height_source === 'osm_height'
+      ? `展示高度：${properties.display_height_m?.toFixed(1)} m（OSM height）`
+      : properties.height_source === 'levels_estimate'
+        ? `展示高度：${properties.display_height_m?.toFixed(1)} m（${properties.building_levels} 层 × 3 m）`
+        : '展示高度：未知，保持平面',
+    `来源：OpenStreetMap (${properties.osm_type} ${properties.osm_id})`,
+  ]
+  content.append(title, ...lines.map((line) => {
+    const item = document.createElement('span')
+    item.textContent = line
+    return item
+  }))
+  return content
+}
+
 function createLivingCirclePopupContent(properties: LivingCircleMapProperties): HTMLElement {
   const content = document.createElement('div')
   content.className = 'coordinate-popup living-circle-popup'
@@ -239,6 +269,11 @@ function createLivingCirclePopupContent(properties: LivingCircleMapProperties): 
 
 interface CityMapProps {
   layers: LayerVisibility
+  viewMode: MapViewMode
+  activeModule: ModuleId
+  onToggleLayer: (layer: keyof LayerVisibility) => void
+  onViewModeChange: (mode: MapViewMode) => void
+  layerCounts: LayerCounts
   onLayerCountsChange: (counts: LayerCounts) => void
   spatialMode: boolean
   queryCenter: QueryCenter | null
@@ -267,6 +302,11 @@ interface CityMapProps {
 
 export default function CityMap({
   layers,
+  viewMode,
+  activeModule,
+  onToggleLayer,
+  onViewModeChange,
+  layerCounts,
   onLayerCountsChange,
   spatialMode,
   queryCenter,
@@ -329,10 +369,19 @@ export default function CityMap({
   useEffect(() => {
     layersRef.current = layers
     const map = mapRef.current
-    if (!map || !map.loaded()) return
+    if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layers.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
     setBuildingVisibility(map, layers.buildings)
+    setBuildingMode(map, layers.buildings, viewMode === '3d' && layers.buildings3d)
     setRoadVisibility(map, layers.roads)
+    setSpatialQueryVisibility(map, spatialModeRef.current && layers.analysis)
+    setRoutingVisibility(map, routingModeActiveRef.current && layers.analysis)
+    setEmergencyVisibility(map, emergencyModeActiveRef.current && layers.analysis)
+    setLivingCircleVisibility(map, livingCircleModeActiveRef.current && layers.analysis)
+    setIsochroneVisibility(map, layers.analysis && Boolean(
+      (routingModeActiveRef.current && routingModeRef.current === 'isochrone') ||
+      (emergencyModeActiveRef.current && emergencyResultRef.current),
+    ))
     if (layers.buildings) {
       refreshBuildingsRef.current?.()
     } else {
@@ -348,7 +397,18 @@ export default function CityMap({
       countsRef.current = { ...countsRef.current, roads: 0 }
       onLayerCountsChange(countsRef.current)
     }
-  }, [layers, onLayerCountsChange])
+  }, [layers, viewMode, onLayerCountsChange])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    map.easeTo({
+      pitch: viewMode === '3d' ? 52 : 0,
+      bearing: viewMode === '3d' ? -18 : 0,
+      zoom: viewMode === '3d' ? Math.max(map.getZoom(), 14.25) : map.getZoom(),
+      duration: 220,
+    })
+  }, [viewMode])
 
   useEffect(() => {
     spatialModeRef.current = spatialMode
@@ -357,9 +417,9 @@ export default function CityMap({
     queryResultsRef.current = queryResults
     selectQueryCenterRef.current = onSelectQueryCenter
     const map = mapRef.current
-    if (!map || !map.loaded()) return
+    if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialMode && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
-    setSpatialQueryVisibility(map, spatialMode)
+    setSpatialQueryVisibility(map, spatialMode && layersRef.current.analysis)
     setSpatialQueryData(map, queryCenter, queryRadiusM, queryResults)
   }, [spatialMode, queryCenter, queryRadiusM, queryResults, onSelectQueryCenter])
 
@@ -373,11 +433,11 @@ export default function CityMap({
     isochroneResultRef.current = isochroneResult
     selectRoutingPointRef.current = onSelectRoutingPoint
     const map = mapRef.current
-    if (!map || !map.loaded()) return
+    if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
-    setRoutingVisibility(map, routingModeActive)
+    setRoutingVisibility(map, routingModeActive && layersRef.current.analysis)
     if (routingModeActive) {
-      setIsochroneVisibility(map, routingMode === 'isochrone')
+      setIsochroneVisibility(map, routingMode === 'isochrone' && layersRef.current.analysis)
       setIsochroneData(map, isochroneResult)
     } else if (!emergencyModeActiveRef.current) {
       setIsochroneVisibility(map, false)
@@ -392,13 +452,13 @@ export default function CityMap({
     emergencyResultRef.current = emergencyResult
     selectIncidentRef.current = onSelectIncident
     const map = mapRef.current
-    if (!map || !map.loaded()) return
+    if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActive && !livingCircleModeActiveRef.current)
-    setEmergencyVisibility(map, emergencyModeActive)
+    setEmergencyVisibility(map, emergencyModeActive && layersRef.current.analysis)
     setEmergencyData(map, incident, emergencyResult)
     if (emergencyModeActive) {
       setIsochroneData(map, emergencyResult?.response_isochrones ?? null)
-      setIsochroneVisibility(map, Boolean(emergencyResult))
+      setIsochroneVisibility(map, Boolean(emergencyResult) && layersRef.current.analysis)
     } else if (!routingModeActiveRef.current) {
       setIsochroneData(map, null)
       setIsochroneVisibility(map, false)
@@ -412,9 +472,9 @@ export default function CityMap({
     livingCircleCategoriesRef.current = livingCircleCategories
     selectLivingCircleOriginRef.current = onSelectLivingCircleOrigin
     const map = mapRef.current
-    if (!map || !map.loaded()) return
+    if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActive)
-    setLivingCircleVisibility(map, livingCircleModeActive)
+    setLivingCircleVisibility(map, livingCircleModeActive && layersRef.current.analysis)
     setLivingCircleData(map, livingCircleOrigin, livingCircleResult)
     setLivingCircleCategoryFilter(map, livingCircleCategories)
   }, [livingCircleModeActive, livingCircleOrigin, livingCircleResult, livingCircleCategories, onSelectLivingCircleOrigin])
@@ -520,12 +580,13 @@ export default function CityMap({
       hasLoaded = true
       addRoadLayer(map, layersRef.current.roads)
       addBuildingLayer(map, layersRef.current.buildings)
+      setBuildingMode(map, layersRef.current.buildings, viewMode === '3d' && layersRef.current.buildings3d)
       addPoiLayer(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
-      addSpatialQueryLayers(map, spatialModeRef.current)
-      addIsochroneLayers(map, (routingModeActiveRef.current && routingModeRef.current === 'isochrone') || Boolean(emergencyModeActiveRef.current && emergencyResultRef.current))
-      addRoutingLayers(map, routingModeActiveRef.current)
-      addEmergencyLayers(map, emergencyModeActiveRef.current)
-      addLivingCircleLayers(map, livingCircleModeActiveRef.current)
+      addSpatialQueryLayers(map, spatialModeRef.current && layersRef.current.analysis)
+      addIsochroneLayers(map, layersRef.current.analysis && ((routingModeActiveRef.current && routingModeRef.current === 'isochrone') || Boolean(emergencyModeActiveRef.current && emergencyResultRef.current)))
+      addRoutingLayers(map, routingModeActiveRef.current && layersRef.current.analysis)
+      addEmergencyLayers(map, emergencyModeActiveRef.current && layersRef.current.analysis)
+      addLivingCircleLayers(map, livingCircleModeActiveRef.current && layersRef.current.analysis)
       setSpatialQueryData(
         map,
         queryCenterRef.current,
@@ -620,6 +681,14 @@ export default function CityMap({
         selectQueryCenterRef.current({ lon: event.lngLat.lng, lat: event.lngLat.lat })
         return
       }
+      const cluster = map.queryRenderedFeatures(event.point, { layers: [POI_CLUSTER_LAYER_ID] })[0]
+      if (cluster?.properties?.cluster_id !== undefined) {
+        const source = map.getSource(POI_SOURCE_ID) as GeoJSONSource
+        void source.getClusterExpansionZoom(Number(cluster.properties.cluster_id)).then((zoom) => {
+          map.easeTo({ center: event.lngLat, zoom, duration: 220 })
+        })
+        return
+      }
       const poiFeature = map.queryRenderedFeatures(event.point, { layers: [POI_LAYER_ID] })[0]
       if (poiFeature?.properties) {
         popupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 12 })
@@ -633,6 +702,16 @@ export default function CityMap({
         popupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 12 })
           .setLngLat(event.lngLat)
           .setDOMContent(createRoadPopupContent(roadFeature.properties as RoadProperties))
+          .addTo(map)
+        return
+      }
+      const buildingFeature = map.queryRenderedFeatures(event.point, {
+        layers: [BUILDING_EXTRUSION_LAYER_ID, BUILDING_FILL_LAYER_ID],
+      })[0]
+      if (buildingFeature?.properties) {
+        popupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 12 })
+          .setLngLat(event.lngLat)
+          .setDOMContent(createBuildingPopupContent(buildingFeature.properties as BuildingProperties))
           .addTo(map)
         return
       }
@@ -684,12 +763,13 @@ export default function CityMap({
   }, [onLayerCountsChange])
 
   const returnToLanzhou = () => {
-    mapRef.current?.flyTo({
+    onViewModeChange('2d')
+    mapRef.current?.easeTo({
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
       pitch: DEFAULT_PITCH,
       bearing: DEFAULT_BEARING,
-      essential: true,
+      duration: 220,
     })
   }
 
@@ -697,10 +777,20 @@ export default function CityMap({
     <section className="map-panel" aria-label="MapLibre 兰州地图">
       <div ref={containerRef} className="map-container" />
       <MapStatus status={loadStatus} />
-      <button className="return-button" type="button" onClick={returnToLanzhou}>
-        <span aria-hidden="true">↙</span>
-        返回兰州
-      </button>
+      <MapToolbar
+        layers={layers}
+        counts={layerCounts}
+        viewMode={viewMode}
+        onToggleLayer={onToggleLayer}
+        onViewModeChange={onViewModeChange}
+        onResetView={returnToLanzhou}
+      />
+      <MapLegend
+        module={activeModule}
+        routingMode={routingMode}
+        building3d={layers.buildings && viewMode === '3d' && layers.buildings3d}
+        livingCategories={livingCircleCategories}
+      />
       <MapCoordinates coordinates={coordinates} />
     </section>
   )

@@ -2,6 +2,7 @@ import type { Feature, FeatureCollection, LineString, MultiPolygon, Point, Polyg
 import type { GeoJSONSource, Map } from 'maplibre-gl'
 import type { LivingCircleCategory, LivingCirclePoiProperties, LivingCircleResponse } from '../../../types/livingCircle'
 import type { QueryCenter } from '../../../types/spatial'
+import { ISOCHRONE_COLORS, LIVING_CATEGORY_COLORS, MAP_COLORS } from '../../../config/visualization'
 
 export const LIVING_AREA_SOURCE_ID = 'cityscope-living-circle-areas'
 export const LIVING_RESULT_SOURCE_ID = 'cityscope-living-circle-results'
@@ -11,14 +12,10 @@ export const LIVING_ORIGIN_LAYER_ID = 'cityscope-living-circle-origin'
 const EMPTY_AREAS: FeatureCollection<Polygon | MultiPolygon> = { type: 'FeatureCollection', features: [] }
 const EMPTY_RESULTS: FeatureCollection<Point | LineString> = { type: 'FeatureCollection', features: [] }
 const BANDS = [
-  { minutes: 15, color: '#5b78c7', opacity: 0.18 },
-  { minutes: 10, color: '#35a493', opacity: 0.23 },
-  { minutes: 5, color: '#f0ad43', opacity: 0.31 },
+  { minutes: 15, color: ISOCHRONE_COLORS[15], opacity: 0.16 },
+  { minutes: 10, color: ISOCHRONE_COLORS[10], opacity: 0.2 },
+  { minutes: 5, color: ISOCHRONE_COLORS[5], opacity: 0.27 },
 ] as const
-const CATEGORY_COLORS: Record<LivingCircleCategory, string> = {
-  commercial: '#e48a3a', healthcare: '#cf5348', education: '#6477c9',
-  recreation: '#369c69', transport: '#568b9f',
-}
 
 function resultFeatures(origin: QueryCenter | null, result: LivingCircleResponse | null): FeatureCollection<Point | LineString> {
   const features: Feature<Point | LineString>[] = []
@@ -49,18 +46,18 @@ export function addLivingCircleLayers(map: Map, visible: boolean): void {
     'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 15, 7],
     'circle-color': [
       'match', ['get', 'category'],
-      'commercial', CATEGORY_COLORS.commercial,
-      'healthcare', CATEGORY_COLORS.healthcare,
-      'education', CATEGORY_COLORS.education,
-      'recreation', CATEGORY_COLORS.recreation,
-      'transport', CATEGORY_COLORS.transport,
+      'commercial', LIVING_CATEGORY_COLORS.commercial,
+      'healthcare', LIVING_CATEGORY_COLORS.healthcare,
+      'education', LIVING_CATEGORY_COLORS.education,
+      'recreation', LIVING_CATEGORY_COLORS.recreation,
+      'transport', LIVING_CATEGORY_COLORS.transport,
       '#667772',
     ],
     'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.8, 'circle-opacity': 0.96,
   } })
   map.addLayer({ id: LIVING_ORIGIN_LAYER_ID, type: 'circle', source: LIVING_RESULT_SOURCE_ID, filter: ['in', ['get', 'kind'], ['literal', ['origin', 'snap']]], layout: { visibility }, paint: {
     'circle-radius': ['match', ['get', 'kind'], 'origin', 9, 4],
-    'circle-color': ['match', ['get', 'kind'], 'origin', '#173f37', '#6f827c'],
+    'circle-color': ['match', ['get', 'kind'], 'origin', MAP_COLORS.origin, '#6f827c'],
     'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5,
   } })
 }

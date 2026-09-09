@@ -23,17 +23,20 @@ import type {
   RoutingStatus,
   ShortestPathResponse,
 } from '../../types/routing'
+import Icon, { type IconName } from '../ui/Icons'
 
 export type ModuleId = 'overview' | 'spatial' | 'routing' | 'emergency' | 'living-circle'
-export interface LayerVisibility { pois: boolean; buildings: boolean; roads: boolean }
+export interface LayerVisibility {
+  pois: boolean
+  buildings: boolean
+  roads: boolean
+  analysis: boolean
+  buildings3d: boolean
+}
 
 interface SidebarProps {
   activeModule: ModuleId
   onSelect: (moduleId: ModuleId) => void
-  layers: LayerVisibility
-  onToggleLayer: (layer: keyof LayerVisibility) => void
-  databaseOnline: boolean
-  layerCounts: { pois: number; buildings: number; roads: number }
   queryCenter: QueryCenter | null
   queryRadiusM: number
   queryCategory: PoiCategory | ''
@@ -71,21 +74,23 @@ interface SidebarProps {
   onReselectLivingCircle: () => void
 }
 
-const MODULES: ReadonlyArray<{ id: ModuleId; label: string; description: string }> = [
-  { id: 'overview', label: '城市总览', description: '浏览兰州市基础地图' },
-  { id: 'spatial', label: '空间查询', description: '按点击位置执行 PostGIS 范围查询' },
-  { id: 'routing', label: '路径规划', description: '计算最短路径、最快设施与道路时间可达圈' },
-  { id: 'emergency', label: '应急响应', description: '医疗与消防响应决策支持' },
-  { id: 'living-circle', label: '15分钟生活圈', description: '沿真实步行网络分析核心服务可达性' },
+const MODULE_GROUPS: ReadonlyArray<{
+  label: string
+  items: ReadonlyArray<{ id: ModuleId; label: string; description: string; icon: IconName }>
+}> = [
+  { label: '地图展示', items: [{ id: 'overview', label: '城市总览', description: '基础数据与 2.5D 建筑', icon: 'map' }] },
+  { label: '基础分析', items: [{ id: 'spatial', label: '空间查询', description: '查询真实 POI 与建筑', icon: 'search' }] },
+  { label: '出行分析', items: [{ id: 'routing', label: '路径与可达圈', description: '路径、设施与机动车可达圈', icon: 'route' }] },
+  { label: '城市业务', items: [
+    { id: 'emergency', label: '应急响应', description: '医疗与消防决策支持', icon: 'alert' },
+    { id: 'living-circle', label: '15分钟生活圈', description: '步行网络服务可达性', icon: 'walk' },
+  ] },
 ]
+const MODULES = MODULE_GROUPS.flatMap((group) => group.items)
 
 export default function Sidebar({
   activeModule,
   onSelect,
-  layers,
-  onToggleLayer,
-  databaseOnline,
-  layerCounts,
   queryCenter,
   queryRadiusM,
   queryCategory,
@@ -132,42 +137,23 @@ export default function Sidebar({
         <p>WGS84 · 基础城市地图</p>
       </div>
       <nav className="module-nav" aria-label="CityScope 模块">
-        {MODULES.map((item, index) => (
-          <button
-            className={`module-item${activeModule === item.id ? ' is-active' : ''}`}
-            key={item.id}
-            onClick={() => onSelect(item.id)}
-            type="button"
-            aria-current={activeModule === item.id ? 'page' : undefined}
-          >
-            <span className="module-number">0{index + 1}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {MODULE_GROUPS.map((group) => <div className="module-group" key={group.label}>
+          <span className="module-group__label">{group.label}</span>
+          {group.items.map((item) => (
+            <button
+              className={`module-item${activeModule === item.id ? ' is-active' : ''}`}
+              key={item.id}
+              onClick={() => onSelect(item.id)}
+              type="button"
+              aria-current={activeModule === item.id ? 'page' : undefined}
+              title={item.description}
+            >
+              <Icon name={item.icon} />
+              <span><strong>{item.label}</strong><small>{item.description}</small></span>
+            </button>
+          ))}
+        </div>)}
       </nav>
-      {activeModule === 'overview' && <section className="layer-panel" aria-label="地图图层">
-        <span className="section-kicker">MAP LAYERS</span>
-        <label className="layer-toggle">
-          <input type="checkbox" checked={layers.roads} onChange={() => onToggleLayer('roads')} />
-          <span>有向道路网络</span>
-          <b>{layerCounts.roads.toLocaleString()}</b>
-        </label>
-        <label className="layer-toggle">
-          <input type="checkbox" checked={layers.pois} onChange={() => onToggleLayer('pois')} />
-          <span>兴趣点 POI</span>
-          <b>{layerCounts.pois.toLocaleString()}</b>
-        </label>
-        <label className="layer-toggle">
-          <input
-            type="checkbox"
-            checked={layers.buildings}
-            onChange={() => onToggleLayer('buildings')}
-          />
-          <span>建筑轮廓</span>
-          <b>{layerCounts.buildings.toLocaleString()}</b>
-        </label>
-        <p className="layer-hint">路网在缩放级别 13、建筑在 14 以上按当前视窗加载</p>
-      </section>}
       {activeModule === 'spatial' && (
         <SpatialQueryPanel
           center={queryCenter}
@@ -221,15 +207,11 @@ export default function Sidebar({
           onReselect={onReselectLivingCircle}
         />
       )}
-      <div className={`database-status${databaseOnline ? ' is-online' : ''}`} role="status">
-        <span className="status-dot" aria-hidden="true" />
-        PostGIS {databaseOnline ? 'Connected' : 'Unavailable'}
-      </div>
-      {activeModule === 'overview' && <div className="module-note" role="status" aria-live="polite">
+      <div className="module-note" role="status" aria-live="polite">
         <strong>{activeItem.label}</strong>
         <span>{activeItem.description}</span>
-      </div>}
-      <div className="phase-label">PHASE 8 · WALKING LIVING CIRCLE</div>
+      </div>
+      <div className="phase-label">PHASE 9 · THEMATIC VISUALIZATION</div>
     </aside>
   )
 }

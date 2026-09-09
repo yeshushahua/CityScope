@@ -7,6 +7,7 @@ import type {
   RoutingStatus,
   ShortestPathResponse,
 } from '../../types/routing'
+import { formatArea, formatCoordinate, formatCount, formatDistance, formatDuration } from '../../utils/format'
 
 interface RoutingPanelProps {
   mode: RoutingMode
@@ -40,7 +41,7 @@ function PointValue({ label, point }: { label: string; point: QueryCenter | null
   return (
     <div className="route-point-row">
       <span>{label}</span>
-      <b>{point ? `${point.lon.toFixed(5)}, ${point.lat.toFixed(5)}` : '待选择'}</b>
+      <b>{point ? `${formatCoordinate(point.lon)}, ${formatCoordinate(point.lat)}` : '待选择'}</b>
     </div>
   )
 }
@@ -103,11 +104,11 @@ export default function RoutingPanel({
 
       {route && status === 'success' && (
         <div className="route-metrics">
-          <div><span>路网距离</span><strong>{(route.properties.routing_distance_m / 1000).toFixed(2)} km</strong></div>
-          <div><span>预计时间</span><strong>{route.properties.travel_time_min.toFixed(2)} min</strong></div>
-          <div><span>道路边数</span><strong>{route.properties.edge_count}</strong></div>
+          <div><span>路网距离</span><strong>{formatDistance(route.properties.routing_distance_m)}</strong></div>
+          <div><span>预计时间</span><strong>{formatDuration(route.properties.travel_time_s)}</strong></div>
+          <div><span>道路边数</span><strong>{formatCount(route.properties.edge_count)}</strong></div>
           {mode === 'shortest' && shortestResult && (
-            <div><span>吸附距离</span><strong>{shortestResult.start_snap.snap_distance_m.toFixed(0)} / {shortestResult.end_snap.snap_distance_m.toFixed(0)} m</strong></div>
+            <div><span>吸附距离</span><strong>{formatDistance(shortestResult.start_snap.snap_distance_m)} / {formatDistance(shortestResult.end_snap.snap_distance_m)}</strong></div>
           )}
         </div>
       )}
@@ -118,14 +119,14 @@ export default function RoutingPanel({
             <span>最快可达</span>
             <strong>{nearestResult.best.name || '未命名设施'}</strong>
             <small>{nearestResult.best.category} / {nearestResult.best.subcategory}</small>
-            <small>路网 {nearestResult.best.network_distance_m.toFixed(0)} m · 直线 {nearestResult.best.straight_distance_m.toFixed(0)} m</small>
-            <small>预计 {nearestResult.best.travel_time_min.toFixed(2)} min · 设施吸附 {nearestResult.best.facility_snap_distance_m.toFixed(0)} m</small>
+            <small>路网 {formatDistance(nearestResult.best.network_distance_m)} · 直线 {formatDistance(nearestResult.best.straight_distance_m)}</small>
+            <small>预计 {formatDuration(nearestResult.best.travel_time_s)} · 设施吸附 {formatDistance(nearestResult.best.facility_snap_distance_m)}</small>
           </div>
           <div className="candidate-list">
             {nearestResult.candidates.map((candidate) => (
               <button key={candidate.poi_id} type="button" onClick={() => onFocus(candidate.lon, candidate.lat)}>
-                <span><b>#{candidate.rank} {candidate.name || '未命名设施'}</b><small>路网 {candidate.network_distance_m.toFixed(0)} m · 直线 {candidate.straight_distance_m.toFixed(0)} m</small></span>
-                <strong>{candidate.travel_time_min.toFixed(2)} min</strong>
+                <span><b>#{candidate.rank} {candidate.name || '未命名设施'}</b><small>路网 {formatDistance(candidate.network_distance_m)} · 直线 {formatDistance(candidate.straight_distance_m)}</small></span>
+                <strong>{formatDuration(candidate.travel_time_s)}</strong>
               </button>
             ))}
           </div>
@@ -137,18 +138,18 @@ export default function RoutingPanel({
         <div className="isochrone-results">
           <div className="isochrone-snap">
             <span>起点吸附距离</span>
-            <strong>{isochroneResult.snap.snap_distance_m.toFixed(1)} m</strong>
+            <strong>{formatDistance(isochroneResult.snap.snap_distance_m)}</strong>
           </div>
           <div className="isochrone-band-list">
             {isochroneResult.isochrones.features.map((feature) => (
               <div className={`isochrone-band is-${feature.properties.minutes}`} key={feature.properties.minutes}>
                 <strong>{feature.properties.minutes} 分钟</strong>
-                <span>{feature.properties.reachable_node_count.toLocaleString()} 个节点</span>
-                <b>{feature.properties.area_km2.toFixed(3)} km²</b>
+                <span>{formatCount(feature.properties.reachable_node_count)} 个节点</span>
+                <b>{formatArea(feature.properties.area_m2)}</b>
               </div>
             ))}
           </div>
-          <p className="isochrone-note">基于静态道路速度估算 · 顶点可达范围近似边界</p>
+          <p className="model-note"><strong>模型说明</strong>基于静态道路等级速度估算，不含实时交通；边界为可达顶点近似范围。</p>
         </div>
       )}
 
