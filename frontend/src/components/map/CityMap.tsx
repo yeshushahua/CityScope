@@ -436,13 +436,6 @@ export default function CityMap({
     if (!map || !map.isStyleLoaded()) return
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActive && !emergencyModeActiveRef.current && !livingCircleModeActiveRef.current)
     setRoutingVisibility(map, routingModeActive && layersRef.current.analysis)
-    if (routingModeActive) {
-      setIsochroneVisibility(map, routingMode === 'isochrone' && layersRef.current.analysis)
-      setIsochroneData(map, isochroneResult)
-    } else if (!emergencyModeActiveRef.current) {
-      setIsochroneVisibility(map, false)
-      setIsochroneData(map, null)
-    }
     setRoutingData(map, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult)
   }, [routingModeActive, routingMode, routeStart, routeEnd, shortestResult, nearestResult, isochroneResult, onSelectRoutingPoint])
 
@@ -456,14 +449,24 @@ export default function CityMap({
     setPoiVisibility(map, layersRef.current.pois && !spatialModeRef.current && !routingModeActiveRef.current && !emergencyModeActive && !livingCircleModeActiveRef.current)
     setEmergencyVisibility(map, emergencyModeActive && layersRef.current.analysis)
     setEmergencyData(map, incident, emergencyResult)
+  }, [emergencyModeActive, incident, emergencyResult, onSelectIncident])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded()) return
     if (emergencyModeActive) {
       setIsochroneData(map, emergencyResult?.response_isochrones ?? null)
-      setIsochroneVisibility(map, Boolean(emergencyResult) && layersRef.current.analysis)
-    } else if (!routingModeActiveRef.current) {
-      setIsochroneData(map, null)
-      setIsochroneVisibility(map, false)
+      setIsochroneVisibility(map, Boolean(emergencyResult) && layers.analysis)
+      return
     }
-  }, [emergencyModeActive, incident, emergencyResult, onSelectIncident])
+    if (routingModeActive && routingMode === 'isochrone') {
+      setIsochroneData(map, isochroneResult)
+      setIsochroneVisibility(map, Boolean(isochroneResult) && layers.analysis)
+      return
+    }
+    setIsochroneData(map, null)
+    setIsochroneVisibility(map, false)
+  }, [routingModeActive, routingMode, isochroneResult, emergencyModeActive, emergencyResult, layers.analysis])
 
   useEffect(() => {
     livingCircleModeActiveRef.current = livingCircleModeActive
