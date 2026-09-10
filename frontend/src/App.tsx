@@ -10,7 +10,7 @@ import {
   fetchEmergencyResponse,
   fetchLivingCircle,
   fetchNearestFacility,
-  fetchShortestPath,
+  fetchTrafficComparison,
   fetchSpatialSummary,
 } from './services/api'
 import type { LayerCounts } from './types/geojson'
@@ -29,6 +29,7 @@ import type {
   RoutingMode,
   RoutingStatus,
   ShortestPathResponse,
+  TrafficComparisonResponse,
 } from './types/routing'
 import type { EmergencyResponse, EmergencyStatus, IncidentType } from './types/emergency'
 import type {
@@ -65,6 +66,7 @@ export default function App() {
   const [routeEnd, setRouteEnd] = useState<QueryCenter | null>(null)
   const [facilityPreset, setFacilityPreset] = useState<FacilityPreset>('hospital')
   const [shortestResult, setShortestResult] = useState<ShortestPathResponse | null>(null)
+  const [trafficComparison, setTrafficComparison] = useState<TrafficComparisonResponse | null>(null)
   const [nearestResult, setNearestResult] = useState<NearestFacilityResponse | null>(null)
   const [isochroneResult, setIsochroneResult] = useState<IsochroneResponse | null>(null)
   const [incidentType, setIncidentType] = useState<IncidentType>('medical')
@@ -132,17 +134,22 @@ export default function App() {
     const controller = new AbortController()
     setRoutingStatus('loading')
     setShortestResult(null)
+    setTrafficComparison(null)
     setNearestResult(null)
     setIsochroneResult(null)
     const request = routingMode === 'shortest'
-      ? fetchShortestPath(routeStart, routeEnd!, controller.signal)
+      ? fetchTrafficComparison(routeStart, routeEnd!, controller.signal)
       : routingMode === 'nearest'
         ? fetchNearestFacility(routeStart, facilityPreset, controller.signal)
         : fetchIsochrone(routeStart, controller.signal)
     request
       .then((result) => {
         if (controller.signal.aborted) return
-        if (routingMode === 'shortest') setShortestResult(result as ShortestPathResponse)
+        if (routingMode === 'shortest') {
+          const comparison = result as TrafficComparisonResponse
+          setTrafficComparison(comparison)
+          setShortestResult(comparison.cityscope.route)
+        }
         else if (routingMode === 'nearest') setNearestResult(result as NearestFacilityResponse)
         else setIsochroneResult(result as IsochroneResponse)
         setRoutingStatus('success')
@@ -230,12 +237,14 @@ export default function App() {
     setRouteStart(null)
     setRouteEnd(null)
     setShortestResult(null)
+    setTrafficComparison(null)
     setNearestResult(null)
     setIsochroneResult(null)
     setRoutingStatus('selecting_start')
   }, [])
   const clearRoutingResult = useCallback(() => {
     setShortestResult(null)
+    setTrafficComparison(null)
     setNearestResult(null)
     setIsochroneResult(null)
     setRoutingStatus('idle')
@@ -245,6 +254,7 @@ export default function App() {
     setRouteStart(null)
     setRouteEnd(null)
     setShortestResult(null)
+    setTrafficComparison(null)
     setNearestResult(null)
     setIsochroneResult(null)
     setRoutingStatus('selecting_start')
@@ -259,6 +269,7 @@ export default function App() {
       setRouteStart(point)
       setRouteEnd(null)
       setShortestResult(null)
+      setTrafficComparison(null)
       setRoutingStatus('selecting_end')
     } else {
       setRouteEnd(point)
@@ -317,6 +328,7 @@ export default function App() {
           routeEnd={routeEnd}
           facilityPreset={facilityPreset}
           shortestResult={shortestResult}
+          trafficComparison={trafficComparison}
           nearestResult={nearestResult}
           isochroneResult={isochroneResult}
           onRoutingModeChange={changeRoutingMode}

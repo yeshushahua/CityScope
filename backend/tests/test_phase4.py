@@ -30,11 +30,11 @@ def test_routing_edges_are_complete_and_traceable() -> None:
             )
         ).mappings().one()
     assert row == {
-        "edges": 18441,
+        "edges": 18439,
         "null_source": 0,
         "null_target": 0,
         "untraced": 0,
-        "matched_raw_edges": 18441,
+        "matched_raw_edges": 18439,
     }
 
 
@@ -101,7 +101,26 @@ def test_osm_and_default_speed_sources_are_both_present() -> None:
             ).all()
         )
     assert counts["osm"] == 430
-    assert counts["default"] == 18011
+    assert counts["default"] == 18009
+
+
+def test_motor_network_excludes_ladders_and_caps_effective_speed() -> None:
+    with engine.connect() as connection:
+        row = connection.execute(
+            text(
+                """
+                SELECT COUNT(*) FILTER (
+                         WHERE 'ladder' = ANY(
+                           regexp_split_to_array(COALESCE(highway, ''), '\\s*;\\s*')
+                         )
+                       ) AS ladder_edges,
+                       MAX(speed_kph) AS maximum_speed_kph
+                FROM routing_edges
+                """
+            )
+        ).mappings().one()
+    assert row["ladder_edges"] == 0
+    assert row["maximum_speed_kph"] == 65
 
 
 def test_multiple_osm_edges_with_same_uv_are_preserved() -> None:
@@ -209,7 +228,7 @@ def test_network_stats_report_real_database_metrics() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["nodes"] == 8286
-    assert body["edges"] == 18441
+    assert body["edges"] == 18439
     assert body["oneway_edges"] + body["bidirectional_edges"] == body["edges"]
     assert body["length_km"] > 0
     assert body["avg_speed_kph"] > 0

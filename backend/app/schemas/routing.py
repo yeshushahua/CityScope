@@ -44,6 +44,49 @@ class ShortestPathResponse(BaseModel):
     route: RouteFeature
 
 
+class CityScopeRouteEstimate(BaseModel):
+    distance_m: float
+    duration_s: float
+    duration_min: float
+    average_speed_kph: float | None
+    route: ShortestPathResponse
+
+
+class AmapTrafficBreakdown(BaseModel):
+    smooth_m: float = 0
+    slow_m: float = 0
+    congested_m: float = 0
+    severely_congested_m: float = 0
+    unknown_m: float = 0
+
+
+class AmapNavigationEstimate(BaseModel):
+    available: bool
+    reason: str | None = None
+    distance_m: float | None = None
+    duration_s: float | None = None
+    duration_min: float | None = None
+    average_speed_kph: float | None = None
+    traffic_light_count: int | None = None
+    toll_yuan: float | None = None
+    alternative_count: int | None = None
+    traffic: AmapTrafficBreakdown | None = None
+
+
+class RouteComparisonMetrics(BaseModel):
+    distance_difference_m: float | None
+    distance_difference_pct: float | None
+    duration_difference_s: float | None
+    duration_difference_pct: float | None
+    speed_difference_kph: float | None
+
+
+class TrafficComparisonResponse(BaseModel):
+    cityscope: CityScopeRouteEstimate
+    amap: AmapNavigationEstimate
+    comparison: RouteComparisonMetrics
+
+
 FacilityCategory = Literal["healthcare", "emergency"]
 FacilitySubcategory = Literal["hospital", "clinic", "doctors", "fire_station"]
 

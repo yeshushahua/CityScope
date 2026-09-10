@@ -44,6 +44,45 @@ export interface ShortestPathResponse {
   route: RouteFeature
 }
 
+export interface AmapTrafficBreakdown {
+  smooth_m: number
+  slow_m: number
+  congested_m: number
+  severely_congested_m: number
+  unknown_m: number
+}
+
+export interface AmapNavigationEstimate {
+  available: boolean
+  reason: string | null
+  distance_m: number | null
+  duration_s: number | null
+  duration_min: number | null
+  average_speed_kph: number | null
+  traffic_light_count: number | null
+  toll_yuan: number | null
+  alternative_count: number | null
+  traffic: AmapTrafficBreakdown | null
+}
+
+export interface TrafficComparisonResponse {
+  cityscope: {
+    distance_m: number
+    duration_s: number
+    duration_min: number
+    average_speed_kph: number | null
+    route: ShortestPathResponse
+  }
+  amap: AmapNavigationEstimate
+  comparison: {
+    distance_difference_m: number | null
+    distance_difference_pct: number | null
+    duration_difference_s: number | null
+    duration_difference_pct: number | null
+    speed_difference_kph: number | null
+  }
+}
+
 export interface FacilityCandidate {
   rank: number
   poi_id: number

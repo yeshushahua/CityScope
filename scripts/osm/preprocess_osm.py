@@ -13,26 +13,27 @@ from shapely.ops import linemerge
 
 from scripts.osm.config import AREA_CRS, INTERIM_DIR, SOURCE_CRS, SOURCE_TAG_COLUMNS
 
-DEFAULT_SPEED_KPH = {
-    "motorway": 80.0,
-    "trunk": 60.0,
-    "primary": 50.0,
-    "secondary": 40.0,
-    "tertiary": 35.0,
-    "residential": 30.0,
-    "unclassified": 25.0,
+HIGHWAY_EFFECTIVE_SPEED_KPH = {
+    "motorway": 65.0,
+    "trunk": 45.0,
+    "primary": 35.0,
+    "secondary": 30.0,
+    "tertiary": 25.0,
+    "residential": 20.0,
+    "unclassified": 22.0,
     "living_street": 15.0,
-    "service": 20.0,
-    "motorway_link": 50.0,
-    "trunk_link": 40.0,
-    "primary_link": 35.0,
-    "secondary_link": 30.0,
-    "tertiary_link": 25.0,
-    "busway": 30.0,
-    "escape": 20.0,
-    "road": 25.0,
+    "service": 15.0,
+    "motorway_link": 40.0,
+    "trunk_link": 35.0,
+    "primary_link": 30.0,
+    "secondary_link": 25.0,
+    "tertiary_link": 20.0,
 }
-FALLBACK_SPEED_KPH = 25.0
+FALLBACK_SPEED_KPH = 20.0
+MAXSPEED_TOKEN = re.compile(
+    r"^\s*(?P<value>\d+(?:\.\d+)?)\s*(?P<unit>km/h|mph)?\s*$",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -61,26 +62,50 @@ def _parse_maxspeed(value: object) -> float | None:
     if not text_value:
         return None
     values: list[float] = []
-    for number, unit in re.findall(r"(\d+(?:\.\d+)?)\s*(mph)?", text_value.lower()):
-        speed = float(number) * (1.609344 if unit else 1.0)
+    for token in text_value.split(";"):
+        match = MAXSPEED_TOKEN.fullmatch(token)
+        if match is None:
+            continue
+        unit = (match.group("unit") or "").lower()
+        speed = float(match.group("value")) * (1.609344 if unit == "mph" else 1.0)
         if 5 <= speed <= 120:
             values.append(speed)
     return min(values) if values else None
 
 
+def _highway_classes(highway: str | None) -> list[str]:
+    return [item.strip() for item in (highway or "").split(";") if item.strip()]
+
+
+def _is_motor_highway(highway: str | None) -> bool:
+    return "ladder" not in _highway_classes(highway)
+
+
 def _default_speed(highway: str | None) -> float:
-    classes = [item.strip() for item in (highway or "").split(";") if item.strip()]
-    speeds = [DEFAULT_SPEED_KPH[item] for item in classes if item in DEFAULT_SPEED_KPH]
+    classes = _highway_classes(highway)
+    speeds = [
+        HIGHWAY_EFFECTIVE_SPEED_KPH[item]
+        for item in classes
+        if item in HIGHWAY_EFFECTIVE_SPEED_KPH
+    ]
     return min(speeds) if speeds else FALLBACK_SPEED_KPH
 
 
 def build_routing_edges(edges: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     routing = edges.rename(columns={"u": "source", "v": "target"}).copy()
+    # Keep raw road provenance intact, but never admit ladders to the motor graph.
+    routing = routing[routing["highway"].map(_is_motor_highway)].copy()
     parsed_speeds = routing["maxspeed"].map(_parse_maxspeed)
+    effective_speeds = routing["highway"].map(_default_speed)
+    # "osm" means that a valid OSM maxspeed participated in the capped value.
     routing["speed_source"] = parsed_speeds.map(lambda value: "osm" if pd.notna(value) else "default")
     routing["speed_kph"] = [
-        float(speed) if pd.notna(speed) else _default_speed(highway)
-        for speed, highway in zip(parsed_speeds, routing["highway"], strict=True)
+        min(float(parsed_speed), float(effective_speed))
+        if pd.notna(parsed_speed)
+        else float(effective_speed)
+        for parsed_speed, effective_speed in zip(
+            parsed_speeds, effective_speeds, strict=True
+        )
     ]
     routing["travel_time_s"] = routing["length_m"] / (routing["speed_kph"] / 3.6)
     routing["cost"] = routing["travel_time_s"]

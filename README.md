@@ -14,6 +14,7 @@ CityScope 是一个基于真实 OpenStreetMap 数据构建的城市空间智能�
 - PostGIS 视窗加载、邻近查询和范围统计
 - 有向机动车路网与静态时间成本
 - 点到点最短时间路径与最近设施检索
+- CityScope 静态路线与高德当前驾车导航 ETA 对照
 - 5 / 10 / 15 分钟机动车 Isochrone
 - 医疗与消防应急响应决策支持
 - 独立 OSM 步行路网与 15 分钟生活圈
@@ -58,7 +59,7 @@ flowchart TB
 | 数据 | 数量 |
 | --- | ---: |
 | 机动车节点 | 8,286 |
-| 机动车有向边 | 18,441 |
+| 机动车有向边 | 18,439 |
 | 步行节点 | 23,195 |
 | 步行有向边 | 59,542 |
 | 建筑 | 30,011 |
@@ -68,11 +69,17 @@ flowchart TB
 
 ### 路径规划
 
-地图点先吸附到道路顶点，再以静态通行时间为成本调用 `pgr_dijkstra`，并设置 `directed => true` 保留机动车单行约束。
+地图点先吸附到道路顶点，再以静态通行时间为成本调用 `pgr_dijkstra`，并设置 `directed => true` 保留机动车单行约束。机动车有效速度按 highway 类型设定；可解析的 OSM `maxspeed` 作为上限约束参与 `min(maxspeed, highway effective speed)`，不会直接作为连续行驶速度。
 
 ```text
 vertex snapping → pgr_dijkstra → directed=true → static travel-time cost
 ```
+
+### Current navigation comparison
+
+点到点结果同时展示 **CityScope 静态道路模型**与**高德当前导航估计**的距离、ETA 和平均速度差异，并汇总高德 TMC 路况构成。地图路线始终来自 CityScope；高德只作为可选对照源，其超时、限额或配置错误不会中断原有路径结果。
+
+高德 Web 服务只由 FastAPI 调用。使用前在根目录 `.env` 配置 `AMAP_WEB_SERVICE_KEY`，不要将真实 Key 写入前端或提交到 Git。实现与实测记录见 [docs/amap-traffic-comparison.md](docs/amap-traffic-comparison.md)。
 
 ### 最近设施
 
@@ -146,6 +153,14 @@ npm run dev
 .\.venv\Scripts\python.exe scripts/osm/enrich_building_heights.py
 ```
 
+仅需从现有缓存重新生成机动车有效速度与成本时，可运行：
+
+```powershell
+.\.venv\Scripts\python.exe scripts/osm/rebuild_motor_routing.py
+```
+
+该脚本会先核对缓存道路与数据库 `road_edges` 一致，再事务性替换 `routing_edges`，不会重建 POI 或步行网络。
+
 脚本执行顺序对应：基础表与迁移、机动车 OSM ETL、POI/建筑导入、机动车 routing network、POI 机动车接驳、独立步行网络、POI 步行接驳、建筑高度补充。下载缓存位于 `data/raw/osm/`，清洗产物位于 `data/interim/osm/`，均不会提交到 Git。
 
 更详细的数据库和脚本说明见 [backend/README.md](backend/README.md) 与 [database/README.md](database/README.md)。
@@ -161,7 +176,7 @@ npm run build
 
 最终验收结果：
 
-- Backend tests: **140 passed**
+- Backend tests: **162 passed**
 - Frontend production build: **PASS**
 - PostgreSQL / PostGIS: **healthy**
 - Browser smoke test: **PASS**

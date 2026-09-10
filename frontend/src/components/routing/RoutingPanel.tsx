@@ -6,8 +6,10 @@ import type {
   RoutingMode,
   RoutingStatus,
   ShortestPathResponse,
+  TrafficComparisonResponse,
 } from '../../types/routing'
 import { formatArea, formatCoordinate, formatCount, formatDistance, formatDuration } from '../../utils/format'
+import DataBars from '../ui/DataBars'
 
 interface RoutingPanelProps {
   mode: RoutingMode
@@ -16,6 +18,7 @@ interface RoutingPanelProps {
   end: QueryCenter | null
   facilityPreset: FacilityPreset
   shortestResult: ShortestPathResponse | null
+  trafficComparison: TrafficComparisonResponse | null
   nearestResult: NearestFacilityResponse | null
   isochroneResult: IsochroneResponse | null
   onModeChange: (mode: RoutingMode) => void
@@ -53,6 +56,7 @@ export default function RoutingPanel({
   end,
   facilityPreset,
   shortestResult,
+  trafficComparison,
   nearestResult,
   isochroneResult,
   onModeChange,
@@ -73,6 +77,19 @@ export default function RoutingPanel({
             ? '可达圈服务暂时不可用，请重新选择。'
             : MESSAGE[status]
     : MESSAGE[status]
+  const signedDistance = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : '−'}${formatDistance(Math.abs(value))}`
+  const signedDuration = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : '−'}${formatDuration(Math.abs(value))}`
+  const signedSpeed = (value: number | null) => value === null ? '—' : `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(1)} km/h`
+  const speed = (value: number | null) => value === null ? '—' : `${value.toFixed(1)} km/h`
+  const trafficData = trafficComparison?.amap.traffic
+    ? [
+        { key: 'smooth', label: '畅通', value: Math.round(trafficComparison.amap.traffic.smooth_m), color: '#2f9e73' },
+        { key: 'slow', label: '缓行', value: Math.round(trafficComparison.amap.traffic.slow_m), color: '#e0a22f' },
+        { key: 'congested', label: '拥堵', value: Math.round(trafficComparison.amap.traffic.congested_m), color: '#df7048' },
+        { key: 'severe', label: '严重拥堵', value: Math.round(trafficComparison.amap.traffic.severely_congested_m), color: '#b7473e' },
+        { key: 'unknown', label: '未知', value: Math.round(trafficComparison.amap.traffic.unknown_m), color: '#879590' },
+      ]
+    : null
   return (
     <section className="routing-panel" aria-label="路径规划">
       <div className="routing-mode" role="group" aria-label="规划模式">
@@ -111,6 +128,50 @@ export default function RoutingPanel({
             <div><span>吸附距离</span><strong>{formatDistance(shortestResult.start_snap.snap_distance_m)} / {formatDistance(shortestResult.end_snap.snap_distance_m)}</strong></div>
           )}
         </div>
+      )}
+
+      {mode === 'shortest' && trafficComparison && status === 'success' && (
+        <section className="traffic-comparison-card" aria-label="当前导航对照">
+          <div className="traffic-comparison-card__heading">
+            <span>当前导航对照</span>
+            <small>{trafficComparison.amap.available ? 'AMAP CURRENT ETA' : 'AMAP UNAVAILABLE'}</small>
+          </div>
+          <div className="comparison-source-grid">
+            <div className="comparison-source">
+              <span>CityScope 静态道路模型</span>
+              <strong>{formatDuration(trafficComparison.cityscope.duration_s)}</strong>
+              <small>{formatDistance(trafficComparison.cityscope.distance_m)} · {speed(trafficComparison.cityscope.average_speed_kph)}</small>
+            </div>
+            {trafficComparison.amap.available ? (
+              <div className="comparison-source is-current">
+                <span>高德当前导航估计</span>
+                <strong>{trafficComparison.amap.duration_s === null ? '—' : formatDuration(trafficComparison.amap.duration_s)}</strong>
+                <small>{trafficComparison.amap.distance_m === null ? '—' : formatDistance(trafficComparison.amap.distance_m)} · {speed(trafficComparison.amap.average_speed_kph)}</small>
+              </div>
+            ) : (
+              <div className="comparison-unavailable">
+                <strong>当前导航对照暂不可用</strong>
+                <small>{trafficComparison.amap.reason || '高德服务未返回可用结果'}</small>
+              </div>
+            )}
+          </div>
+          {trafficComparison.amap.available && (
+            <>
+              <div className="comparison-differences" aria-label="高德相对 CityScope 差异">
+                <div><span>距离差</span><strong>{signedDistance(trafficComparison.comparison.distance_difference_m)}</strong></div>
+                <div><span>时间差</span><strong>{signedDuration(trafficComparison.comparison.duration_difference_s)}</strong></div>
+                <div><span>速度差</span><strong>{signedSpeed(trafficComparison.comparison.speed_difference_kph)}</strong></div>
+              </div>
+              <div className="comparison-details">
+                <span>红绿灯 {trafficComparison.amap.traffic_light_count ?? '—'}</span>
+                <span>收费 ¥{trafficComparison.amap.toll_yuan?.toFixed(1) ?? '—'}</span>
+                <span>备选方案 {trafficComparison.amap.alternative_count ?? '—'}</span>
+              </div>
+              {trafficData && <DataBars title="当前路况构成（米）" data={trafficData} />}
+            </>
+          )}
+          <p className="comparison-note">地图仍显示 CityScope 路线。高德数据仅用于当前导航时间对照，由高德 Web 服务提供；CityScope 不生成实时交通预测。</p>
+        </section>
       )}
 
       {mode === 'nearest' && nearestResult && status === 'success' && (

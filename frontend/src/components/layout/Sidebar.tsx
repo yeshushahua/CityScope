@@ -22,6 +22,7 @@ import type {
   RoutingMode,
   RoutingStatus,
   ShortestPathResponse,
+  TrafficComparisonResponse,
 } from '../../types/routing'
 import Icon, { type IconName } from '../ui/Icons'
 
@@ -52,6 +53,7 @@ interface SidebarProps {
   routeEnd: QueryCenter | null
   facilityPreset: FacilityPreset
   shortestResult: ShortestPathResponse | null
+  trafficComparison: TrafficComparisonResponse | null
   nearestResult: NearestFacilityResponse | null
   isochroneResult: IsochroneResponse | null
   onRoutingModeChange: (mode: RoutingMode) => void
@@ -106,6 +108,7 @@ export default function Sidebar({
   routeEnd,
   facilityPreset,
   shortestResult,
+  trafficComparison,
   nearestResult,
   isochroneResult,
   onRoutingModeChange,
@@ -175,6 +178,7 @@ export default function Sidebar({
           end={routeEnd}
           facilityPreset={facilityPreset}
           shortestResult={shortestResult}
+          trafficComparison={trafficComparison}
           nearestResult={nearestResult}
           isochroneResult={isochroneResult}
           onModeChange={onRoutingModeChange}

@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { BuildingCollection, PoiCollection, RoadCollection } from '../types/geojson'
 import type { PoiCategory } from '../config/poiCategories'
 import type { NearbyPoiCollection, QueryCenter, SpatialSummary } from '../types/spatial'
-import type { FacilityPreset, IsochroneResponse, NearestFacilityResponse, ShortestPathResponse } from '../types/routing'
+import type { FacilityPreset, IsochroneResponse, NearestFacilityResponse, ShortestPathResponse, TrafficComparisonResponse } from '../types/routing'
 import type { EmergencyResponse, IncidentType } from '../types/emergency'
 import type { LivingCircleResponse } from '../types/livingCircle'
 
@@ -125,6 +125,19 @@ export async function fetchIsochrone(
     params: { lon: origin.lon, lat: origin.lat, max_snap_m: 500 },
     signal,
   })
+  return data
+}
+
+export async function fetchTrafficComparison(
+  start: QueryCenter,
+  end: QueryCenter,
+  signal?: AbortSignal,
+): Promise<TrafficComparisonResponse> {
+  const { data } = await api.post<TrafficComparisonResponse>(
+    '/api/v1/routing/traffic-comparison',
+    { start, end, max_snap_m: 500 },
+    { signal },
+  )
   return data
 }
 

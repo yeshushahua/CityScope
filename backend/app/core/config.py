@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
+    amap_web_service_key: str = ""
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
