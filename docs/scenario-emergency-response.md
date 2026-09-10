@@ -1,5 +1,7 @@
 # 兰州市城市应急响应分析
 
+[English Version](scenario-emergency-response-en.md) | 中文
+
 **Urban Emergency Response Analysis in Lanzhou**
 
 本案例使用 CityScope 当前数据库与 API 的真实结果，展示任意事件点如何经过 Edge Snapping、候选医疗设施网络时间排序、`facility → incident` 路由、5 / 10 / 15 分钟响应范围与高德当前导航对照。结果采集于 **2026-09-10 16:21（Asia/Shanghai）**；高德结果具有时效性，重新运行时可能变化。
@@ -153,4 +155,3 @@ curl -X POST http://localhost:8000/api/v1/routing/traffic-comparison \
 - 有向约束：`directed = true`、`reverse_cost = -1`。
 - 39 条 `source = target` 的原始 self-loop edge 保留在路网中，但不参与 Edge Snapping 候选。
 - 本案例是空间决策演示，不是真实医疗调度建议。
-
