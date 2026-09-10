@@ -1,10 +1,10 @@
 # CityScope Final Validation
 
-Validation date: 2026-09-09
+Validation date: 2026-09-10
 
 ## Automated checks
 
-- Backend: `140 passed` in 8.79 seconds.
+- Backend: `172 passed` in 18.48 seconds.
 - Frontend: TypeScript validation and Vite production build passed; 115 modules transformed.
 - Build note: MapLibre remains a large lazy-loaded vendor chunk and triggers Vite's non-blocking 500 kB warning.
 - Database: Compose service `postgres` is healthy and `pg_isready` reports accepting connections.
@@ -21,6 +21,12 @@ The local FastAPI and Vite services were started from the documented commands an
 - Fifteen-minute living-circle analysis returned 5 / 5 core categories and network-reachable POIs.
 - 2D and 2.5D/3D building views both rendered.
 - Browser console error count: 0.
+
+The emergency-response scenario at `(103.783489, 36.058598)` was also
+replayed against the real dataset. Shortest-path, nearest-facility,
+motorized Isochrone, emergency response and traffic-comparison all returned
+successfully. The captured values and reproducible requests are recorded in
+[`scenario-emergency-response.md`](scenario-emergency-response.md).
 
 During final smoke testing, inactive motorized/emergency Isochrone layers were found to remain visible after switching to the living-circle module. Isochrone ownership is now resolved from the current module in one effect; switching modules was rebuilt and visually retested successfully.
 
