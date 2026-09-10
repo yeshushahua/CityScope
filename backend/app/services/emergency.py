@@ -20,10 +20,16 @@ from app.services.routing import (
     EDGES_SQL,
     FacilityNotFoundError,
     ReachableFacilityNotFoundError,
+    _facility_edge_locations,
     _facility_rows,
-    build_isochrones_from_node,
-    build_route_between_nodes,
-    snap_point_to_network,
+    _network_snap,
+    build_isochrones_from_points,
+)
+from app.services.edge_routing import PathChoice, route_feature_for_choice, with_points_costs
+from app.services.network_snapping import (
+    EdgeSnapCandidate,
+    WithPointsRegistry,
+    snap_points_to_edges,
 )
 
 FACILITY_FILTERS: dict[IncidentType, tuple[str, str]] = {
@@ -70,7 +76,11 @@ def _costs_from_facilities_to_incident(
 
 
 def _candidate(
-    row: dict[str, Any], *, rank: int, response_time_s: float
+    row: dict[str, Any],
+    *,
+    rank: int,
+    response_time_s: float,
+    snap: EdgeSnapCandidate,
 ) -> EmergencyFacilityCandidate:
     return EmergencyFacilityCandidate(
         network_rank=rank,
@@ -82,8 +92,12 @@ def _candidate(
         subcategory=row["subcategory"],
         lon=float(row["lon"]),
         lat=float(row["lat"]),
-        node_id=int(row["node_id"]),
-        facility_snap_distance_m=round(float(row["snap_distance_m"]), 1),
+        node_id=snap.node_id,
+        edge_id=snap.edge_id,
+        fraction=snap.fraction,
+        snapped_lon=snap.snapped_lon,
+        snapped_lat=snap.snapped_lat,
+        facility_snap_distance_m=round(snap.snap_distance_m, 1),
         straight_distance_m=round(float(row["straight_distance_m"]), 1),
         response_time_s=round(response_time_s, 1),
         response_time_min=round(response_time_s / 60, 2),
@@ -98,9 +112,11 @@ def analyze_emergency_response(
     max_snap_m: int,
     candidate_limit: int,
 ) -> EmergencyResponse:
-    incident_snap = snap_point_to_network(
-        db, lon=incident.lon, lat=incident.lat, max_snap_m=max_snap_m
-    )
+    incident_location = snap_points_to_edges(
+        db,
+        points=[("incident", incident.lon, incident.lat)],
+        max_snap_m=max_snap_m,
+    )["incident"]
     category, subcategory = FACILITY_FILTERS[incident_type]
     facility_total, facilities = _facility_rows(
         db,
@@ -113,44 +129,71 @@ def analyze_emergency_response(
             "Matching emergency facilities are not mapped to the road network"
         )
 
-    source_nodes = sorted({int(row["node_id"]) for row in facilities})
-    costs = _costs_from_facilities_to_incident(
-        db, source_nodes=source_nodes, incident_node=incident_snap.node_id
+    facility_locations = _facility_edge_locations(db, facilities)
+    registry = WithPointsRegistry()
+    registered_incident = registry.register(incident_location)
+    registered_facilities = {
+        int(row["poi_id"]): registry.register(facility_locations[int(row["poi_id"])])
+        for row in facilities
+    }
+    start_vid_to_pois: dict[int, list[int]] = {}
+    for poi_id, registered in registered_facilities.items():
+        for vid in registered.vids:
+            start_vid_to_pois.setdefault(vid, []).append(poi_id)
+    choices = with_points_costs(
+        db,
+        registry=registry,
+        start_vids=sorted(start_vid_to_pois),
+        end_vids=registered_incident.vids,
     )
-    reachable = [row for row in facilities if int(row["node_id"]) in costs]
+    best_choices: dict[int, PathChoice] = {}
+    for choice in choices:
+        for poi_id in start_vid_to_pois.get(choice.start_vid, []):
+            best_choices.setdefault(poi_id, choice)
+    reachable = [row for row in facilities if int(row["poi_id"]) in best_choices]
     if not reachable:
         raise ReachableFacilityNotFoundError(
             "No matching emergency facility can reach the incident node"
         )
     reachable.sort(
         key=lambda row: (
-            costs[int(row["node_id"])],
-            float(row["snap_distance_m"]),
+            best_choices[int(row["poi_id"])].cost,
+            registered_facilities[int(row["poi_id"])].candidate_for_vid(
+                best_choices[int(row["poi_id"])].start_vid
+            ).snap_distance_m,
             float(row["straight_distance_m"]),
             int(row["poi_id"]),
         )
     )
     selected = reachable[:candidate_limit]
-    candidates = [
-        _candidate(
-            row,
-            rank=rank,
-            response_time_s=costs[int(row["node_id"])],
+    candidates: list[EmergencyFacilityCandidate] = []
+    for rank, row in enumerate(selected, start=1):
+        poi_id = int(row["poi_id"])
+        choice = best_choices[poi_id]
+        candidates.append(
+            _candidate(
+                row,
+                rank=rank,
+                response_time_s=choice.cost,
+                snap=registered_facilities[poi_id].candidate_for_vid(choice.start_vid),
+            )
         )
-        for rank, row in enumerate(selected, start=1)
-    ]
     recommended_row = selected[0]
     recommended = candidates[0]
-    recommended_node = int(recommended_row["node_id"])
+    recommended_poi_id = int(recommended_row["poi_id"])
+    recommended_choice = best_choices[recommended_poi_id]
+    recommended_snap = registered_facilities[recommended_poi_id].candidate_for_vid(
+        recommended_choice.start_vid
+    )
+    incident_snap = registered_incident.candidate_for_vid(recommended_choice.end_vid)
 
-    base_route = build_route_between_nodes(
+    base_route = route_feature_for_choice(
         db,
-        start_node=recommended_node,
-        end_node=incident_snap.node_id,
-        zero_coordinate=(
-            float(recommended_row["node_lon"]),
-            float(recommended_row["node_lat"]),
-        ),
+        registry=registry,
+        choice=recommended_choice,
+        zero_coordinate=(recommended_snap.snapped_lon, recommended_snap.snapped_lat)
+        if recommended_choice.start_vid == recommended_choice.end_vid
+        else None,
     )
     route = EmergencyRouteFeature(
         geometry=base_route.geometry,
@@ -162,8 +205,10 @@ def analyze_emergency_response(
             edge_ids=base_route.properties.edge_ids,
         ),
     )
-    response_isochrones = build_isochrones_from_node(
-        db, start_node=recommended_node
+    response_isochrones = build_isochrones_from_points(
+        db,
+        registry=registry,
+        start_vids=registered_facilities[recommended_poi_id].vids,
     )
     straight_nearest = min(
         facilities,
@@ -178,7 +223,7 @@ def analyze_emergency_response(
     return EmergencyResponse(
         incident_type=incident_type,
         incident=incident,
-        incident_snap=incident_snap,
+        incident_snap=_network_snap(incident_snap),
         facility_statistics=EmergencyFacilityStatistics(
             total=facility_total,
             mapped=len(facilities),

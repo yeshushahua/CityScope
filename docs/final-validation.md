@@ -36,7 +36,7 @@ During final smoke testing, inactive motorized/emergency Isochrone layers were f
 
 - Motorized travel time uses static road-class speeds and excludes live traffic.
 - Walking time uses a static 4.8 km/h speed.
-- Endpoints use vertex snapping rather than edge-position map matching.
+- Motorized endpoints use edge snapping; heading, lane and grade-level map matching are outside the current scope.
 - Isochrone boundaries approximate reachable nodes with concave hulls.
 - Building height coverage depends on available OSM tags.
 - Emergency output is a spatial decision demonstration, not an operational dispatch system.

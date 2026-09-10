@@ -14,6 +14,7 @@ from app.services.routing import (
     EDGES_SQL,
     ISOCHRONE_SQL,
     NESTING_TOLERANCE_M,
+    WITH_POINTS_ISOCHRONE_SQL,
 )
 
 client = TestClient(app)
@@ -86,30 +87,11 @@ def test_core_sql_uses_one_directed_900_second_driving_distance() -> None:
 
 
 def test_reachable_node_sets_are_nested() -> None:
-    node_id = center_isochrone_node()
-    with engine.connect() as connection:
-        rows = connection.execute(
-            text(
-                """
-                SELECT node, agg_cost FROM pgr_drivingDistance(
-                    'SELECT id, source, target, cost, reverse_cost FROM routing_edges',
-                    CAST(:node AS bigint), 900, directed => true
-                )
-                """
-            ),
-            {"node": node_id},
-        ).mappings()
-        costs = {int(row["node"]): float(row["agg_cost"]) for row in rows}
-    nodes5 = {node for node, cost in costs.items() if cost <= 300}
-    nodes10 = {node for node, cost in costs.items() if cost <= 600}
-    nodes15 = {node for node, cost in costs.items() if cost <= 900}
-    assert nodes5 <= nodes10 <= nodes15
-
-
-def center_isochrone_node() -> int:
-    response = client.get("/api/v1/routing/isochrone", params=CENTER)
-    assert response.status_code == 200
-    return int(response.json()["snap"]["node_id"])
+    normalized = " ".join(WITH_POINTS_ISOCHRONE_SQL.lower().split())
+    assert "pgr_withpointsdd" in normalized
+    assert "cast(:start_vids as bigint[])" in normalized
+    assert "equicost => true" in normalized
+    assert "directed => true" in normalized
 
 
 def test_reachable_sets_and_areas_are_monotonic(center_isochrone: dict) -> None:

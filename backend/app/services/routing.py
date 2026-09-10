@@ -21,8 +21,23 @@ from app.schemas.routing import (
     RouteProperties,
     ShortestPathResponse,
 )
+from app.services.edge_routing import (
+    EDGES_SQL,
+    PathChoice,
+    RouteNotFoundError,
+    best_path_choice,
+    route_feature_for_choice,
+    with_points_costs,
+)
+from app.services.network_snapping import (
+    EdgeSnapCandidate,
+    EdgeSnapLocation,
+    SnapNotFoundError,
+    WithPointsRegistry,
+    snap_points_to_edges,
+    vertex_location,
+)
 
-EDGES_SQL = "SELECT id, source, target, cost, reverse_cost FROM routing_edges"
 ISOCHRONE_THRESHOLDS = (300, 600, 900)
 CONCAVE_HULL_TARGET_PERCENT = 0.85
 DEGENERATE_BUFFER_M = 20.0
@@ -44,7 +59,7 @@ thresholds(minutes, threshold_s) AS (
 node_sets AS (
     SELECT t.minutes,
            t.threshold_s,
-           COUNT(d.node)::integer AS reachable_node_count,
+           COUNT(n.osm_node_id)::integer AS reachable_node_count,
            ST_Collect(ST_Transform(n.geometry, 32648)) AS points_utm
     FROM thresholds AS t
     LEFT JOIN driving AS d ON d.agg_cost <= t.threshold_s
@@ -111,13 +126,24 @@ FROM final_areas
 ORDER BY threshold_s
 """
 
-
-class SnapNotFoundError(ValueError):
-    pass
-
-
-class RouteNotFoundError(ValueError):
-    pass
+WITH_POINTS_ISOCHRONE_SQL = ISOCHRONE_SQL.replace(
+    """FROM pgr_drivingDistance(
+        :edges_sql,
+        CAST(:start_node AS bigint),
+        900,
+        directed => true
+    )""",
+    """FROM pgr_withPointsDD(
+        :edges_sql,
+        :points_sql,
+        CAST(:start_vids AS bigint[]),
+        900,
+        directed => true,
+        driving_side => 'b',
+        details => false,
+        equicost => true
+    )""",
+)
 
 
 class FacilityNotFoundError(ValueError):
@@ -130,6 +156,52 @@ class ReachableFacilityNotFoundError(ValueError):
 
 class IsochroneGeometryError(RuntimeError):
     pass
+
+
+def _network_snap(candidate: EdgeSnapCandidate) -> NetworkSnap:
+    return NetworkSnap(
+        edge_id=candidate.edge_id,
+        source=candidate.source,
+        target=candidate.target,
+        fraction=round(candidate.fraction, 12)
+        if candidate.fraction is not None
+        else None,
+        snapped_lon=candidate.snapped_lon,
+        snapped_lat=candidate.snapped_lat,
+        node_id=candidate.node_id,
+        # Compatibility fields now identify the actual projected road point.
+        node_lon=candidate.snapped_lon,
+        node_lat=candidate.snapped_lat,
+        snap_distance_m=round(candidate.snap_distance_m, 1),
+    )
+
+
+def _route_between_edge_locations(
+    db: Session,
+    *,
+    start: EdgeSnapLocation,
+    end: EdgeSnapLocation,
+) -> tuple[RouteFeature, EdgeSnapCandidate, EdgeSnapCandidate]:
+    registry = WithPointsRegistry()
+    registered_start = registry.register(start)
+    registered_end = registry.register(end)
+    choice = best_path_choice(
+        db,
+        registry=registry,
+        start_vids=registered_start.vids,
+        end_vids=registered_end.vids,
+    )
+    start_candidate = registered_start.candidate_for_vid(choice.start_vid)
+    end_candidate = registered_end.candidate_for_vid(choice.end_vid)
+    route = route_feature_for_choice(
+        db,
+        registry=registry,
+        choice=choice,
+        zero_coordinate=(start_candidate.snapped_lon, start_candidate.snapped_lat)
+        if choice.start_vid == choice.end_vid
+        else None,
+    )
+    return route, start_candidate, end_candidate
 
 
 def snap_point_to_network(
@@ -256,24 +328,19 @@ def shortest_path(
     end: RoutePoint,
     max_snap_m: int,
 ) -> ShortestPathResponse:
-    start_snap = snap_point_to_network(
-        db, lon=start.lon, lat=start.lat, max_snap_m=max_snap_m
+    snaps = snap_points_to_edges(
+        db,
+        points=[("start", start.lon, start.lat), ("end", end.lon, end.lat)],
+        max_snap_m=max_snap_m,
     )
-    end_snap = snap_point_to_network(
-        db, lon=end.lon, lat=end.lat, max_snap_m=max_snap_m
+    route, start_candidate, end_candidate = _route_between_edge_locations(
+        db, start=snaps["start"], end=snaps["end"]
     )
-    rows = _path_rows(db, start_snap.node_id, end_snap.node_id)
-    zero_coordinate = (
-        (start_snap.node_lon, start_snap.node_lat)
-        if start_snap.node_id == end_snap.node_id
-        else None
-    )
-    route = _route_feature(rows, zero_coordinate=zero_coordinate)
     return ShortestPathResponse(
         start=start,
         end=end,
-        start_snap=start_snap,
-        end_snap=end_snap,
+        start_snap=_network_snap(start_candidate),
+        end_snap=_network_snap(end_candidate),
         route=route,
     )
 
@@ -328,6 +395,35 @@ def _facility_rows(
         params,
     ).mappings()
     return facility_count, [dict(row) for row in rows]
+
+
+def _facility_edge_locations(
+    db: Session, facilities: list[dict[str, Any]]
+) -> dict[int, EdgeSnapLocation]:
+    points = [
+        (f"facility:{int(row['poi_id'])}", float(row["lon"]), float(row["lat"]))
+        for row in facilities
+    ]
+    edge_snaps = snap_points_to_edges(
+        db,
+        points=points,
+        max_snap_m=500,
+        require_all=False,
+    )
+    locations: dict[int, EdgeSnapLocation] = {}
+    for row in facilities:
+        poi_id = int(row["poi_id"])
+        point_key = f"facility:{poi_id}"
+        locations[poi_id] = edge_snaps.get(point_key) or vertex_location(
+            point_key=point_key,
+            lon=float(row["lon"]),
+            lat=float(row["lat"]),
+            node_id=int(row["node_id"]),
+            snapped_lon=float(row["node_lon"]),
+            snapped_lat=float(row["node_lat"]),
+            snap_distance_m=float(row["snap_distance_m"]),
+        )
+    return locations
 
 
 def _costs_to_targets(
@@ -402,42 +498,76 @@ def nearest_facility(
     max_snap_m: int,
     limit: int,
 ) -> NearestFacilityResponse:
-    origin_snap = snap_point_to_network(
-        db, lon=origin.lon, lat=origin.lat, max_snap_m=max_snap_m
-    )
+    origin_location = snap_points_to_edges(
+        db,
+        points=[("origin", origin.lon, origin.lat)],
+        max_snap_m=max_snap_m,
+    )["origin"]
     facility_count, facilities = _facility_rows(
         db, origin=origin, category=category, subcategory=subcategory
     )
     if not facilities:
         raise FacilityNotFoundError("Matching facilities are not mapped to the road network")
-    target_nodes = sorted({int(row["node_id"]) for row in facilities})
-    costs = _costs_to_targets(db, origin_snap.node_id, target_nodes)
-    reachable = [row for row in facilities if int(row["node_id"]) in costs]
+    facility_locations = _facility_edge_locations(db, facilities)
+    registry = WithPointsRegistry()
+    registered_origin = registry.register(origin_location)
+    registered_facilities = {
+        int(row["poi_id"]): registry.register(facility_locations[int(row["poi_id"])])
+        for row in facilities
+    }
+    end_vid_to_pois: dict[int, list[int]] = {}
+    for poi_id, registered in registered_facilities.items():
+        for vid in registered.vids:
+            end_vid_to_pois.setdefault(vid, []).append(poi_id)
+    choices = with_points_costs(
+        db,
+        registry=registry,
+        start_vids=registered_origin.vids,
+        end_vids=sorted(end_vid_to_pois),
+    )
+    best_choices: dict[int, PathChoice] = {}
+    for choice in choices:
+        for poi_id in end_vid_to_pois.get(choice.end_vid, []):
+            best_choices.setdefault(poi_id, choice)
+    reachable = [row for row in facilities if int(row["poi_id"]) in best_choices]
     if not reachable:
         raise ReachableFacilityNotFoundError(
-            "No requested facility is reachable from the snapped origin"
+            "No requested facility is reachable from the edge-snapped origin"
         )
     reachable.sort(
         key=lambda row: (
-            costs[int(row["node_id"])],
-            float(row["snap_distance_m"]),
+            best_choices[int(row["poi_id"])].cost,
+            registered_facilities[int(row["poi_id"])].candidate_for_vid(
+                best_choices[int(row["poi_id"])].end_vid
+            ).snap_distance_m,
             float(row["straight_distance_m"]),
             int(row["poi_id"]),
         )
     )
     selected = reachable[:limit]
-    selected_nodes = sorted({int(row["node_id"]) for row in selected})
-    paths = _paths_to_targets(db, origin_snap.node_id, selected_nodes)
     candidates: list[FacilityCandidate] = []
+    routes: dict[int, RouteFeature] = {}
     for rank, row in enumerate(selected, start=1):
-        node_id = int(row["node_id"])
-        path_rows = paths.get(node_id, [])
-        distance = sum(float(edge["length_m"]) for edge in path_rows)
-        travel_time = costs[node_id]
+        poi_id = int(row["poi_id"])
+        choice = best_choices[poi_id]
+        facility_candidate = registered_facilities[poi_id].candidate_for_vid(
+            choice.end_vid
+        )
+        origin_candidate = registered_origin.candidate_for_vid(choice.start_vid)
+        route = route_feature_for_choice(
+            db,
+            registry=registry,
+            choice=choice,
+            zero_coordinate=(origin_candidate.snapped_lon, origin_candidate.snapped_lat)
+            if choice.start_vid == choice.end_vid
+            else None,
+        )
+        routes[poi_id] = route
+        travel_time = choice.cost
         candidates.append(
             FacilityCandidate(
                 rank=rank,
-                poi_id=int(row["poi_id"]),
+                poi_id=poi_id,
                 osm_type=str(row["osm_type"]),
                 osm_id=str(row["osm_id"]),
                 name=row["name"],
@@ -445,28 +575,29 @@ def nearest_facility(
                 subcategory=row["subcategory"],
                 lon=float(row["lon"]),
                 lat=float(row["lat"]),
-                node_id=node_id,
+                node_id=facility_candidate.node_id,
+                edge_id=facility_candidate.edge_id,
+                fraction=facility_candidate.fraction,
+                snapped_lon=facility_candidate.snapped_lon,
+                snapped_lat=facility_candidate.snapped_lat,
                 straight_distance_m=round(float(row["straight_distance_m"]), 1),
-                network_distance_m=round(distance, 1),
+                network_distance_m=route.properties.routing_distance_m,
                 travel_time_s=round(travel_time, 1),
                 travel_time_min=round(travel_time / 60, 2),
-                facility_snap_distance_m=round(float(row["snap_distance_m"]), 1),
+                facility_snap_distance_m=round(
+                    facility_candidate.snap_distance_m, 1
+                ),
             )
         )
-    best_row = selected[0]
-    best_node = int(best_row["node_id"])
-    best_route = _route_feature(
-        paths.get(best_node, []),
-        zero_coordinate=(origin_snap.node_lon, origin_snap.node_lat)
-        if best_node == origin_snap.node_id
-        else None,
-    )
+    best_poi_id = int(selected[0]["poi_id"])
+    best_choice = best_choices[best_poi_id]
+    best_origin_candidate = registered_origin.candidate_for_vid(best_choice.start_vid)
     return NearestFacilityResponse(
         origin=origin,
-        origin_snap=origin_snap,
+        origin_snap=_network_snap(best_origin_candidate),
         best=candidates[0],
         candidates=candidates,
-        route=best_route,
+        route=routes[best_poi_id],
         meta=NearestFacilityMeta(
             facility_count=facility_count,
             mapped_count=len(facilities),
@@ -483,36 +614,27 @@ def isochrone(
     origin: RoutePoint,
     max_snap_m: int,
 ) -> IsochroneResponse:
-    origin_snap = snap_point_to_network(
-        db, lon=origin.lon, lat=origin.lat, max_snap_m=max_snap_m
+    origin_location = snap_points_to_edges(
+        db,
+        points=[("origin", origin.lon, origin.lat)],
+        max_snap_m=max_snap_m,
+    )["origin"]
+    registry = WithPointsRegistry()
+    registered_origin = registry.register(origin_location)
+    features = build_isochrones_from_points(
+        db,
+        registry=registry,
+        start_vids=registered_origin.vids,
     )
-    features = build_isochrones_from_node(db, start_node=origin_snap.node_id)
 
     return IsochroneResponse(
         origin=origin,
-        snap=origin_snap,
+        snap=_network_snap(origin_location.primary),
         isochrones=features,
     )
 
 
-def build_isochrones_from_node(
-    db: Session,
-    *,
-    start_node: int,
-) -> IsochroneFeatureCollection:
-    """Build fixed outward 5/10/15-minute bands from an existing road node."""
-    rows = list(
-        db.execute(
-            text(ISOCHRONE_SQL),
-            {
-                "edges_sql": EDGES_SQL,
-                "start_node": start_node,
-                "hull_target_percent": CONCAVE_HULL_TARGET_PERCENT,
-                "fallback_buffer_m": DEGENERATE_BUFFER_M,
-                "nesting_tolerance_m": NESTING_TOLERANCE_M,
-            },
-        ).mappings()
-    )
+def _isochrone_features(rows: list[Any]) -> IsochroneFeatureCollection:
     if len(rows) != 3:
         raise IsochroneGeometryError("Isochrone query did not return all time bands")
 
@@ -542,5 +664,47 @@ def build_isochrones_from_node(
                 ),
             )
         )
-
     return IsochroneFeatureCollection(features=features)
+
+
+def build_isochrones_from_points(
+    db: Session,
+    *,
+    registry: WithPointsRegistry,
+    start_vids: list[int],
+) -> IsochroneFeatureCollection:
+    rows = list(
+        db.execute(
+            text(WITH_POINTS_ISOCHRONE_SQL),
+            {
+                "edges_sql": EDGES_SQL,
+                "points_sql": registry.points_sql,
+                "start_vids": sorted(set(start_vids)),
+                "hull_target_percent": CONCAVE_HULL_TARGET_PERCENT,
+                "fallback_buffer_m": DEGENERATE_BUFFER_M,
+                "nesting_tolerance_m": NESTING_TOLERANCE_M,
+            },
+        ).mappings()
+    )
+    return _isochrone_features(rows)
+
+
+def build_isochrones_from_node(
+    db: Session,
+    *,
+    start_node: int,
+) -> IsochroneFeatureCollection:
+    """Build fixed outward 5/10/15-minute bands from an existing road node."""
+    rows = list(
+        db.execute(
+            text(ISOCHRONE_SQL),
+            {
+                "edges_sql": EDGES_SQL,
+                "start_node": start_node,
+                "hull_target_percent": CONCAVE_HULL_TARGET_PERCENT,
+                "fallback_buffer_m": DEGENERATE_BUFFER_M,
+                "nesting_tolerance_m": NESTING_TOLERANCE_M,
+            },
+        ).mappings()
+    )
+    return _isochrone_features(rows)

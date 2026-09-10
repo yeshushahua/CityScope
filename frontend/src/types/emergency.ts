@@ -21,7 +21,11 @@ export interface EmergencyFacilityCandidate {
   subcategory: 'hospital' | 'fire_station'
   lon: number
   lat: number
-  node_id: number
+  node_id: number | null
+  edge_id: number | null
+  fraction: number | null
+  snapped_lon: number | null
+  snapped_lat: number | null
   facility_snap_distance_m: number
   straight_distance_m: number
   response_time_s: number

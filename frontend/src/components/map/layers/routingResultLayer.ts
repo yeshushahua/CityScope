@@ -76,15 +76,24 @@ function resultData(
   })
 
   if (mode === 'shortest' && shortest) {
-    const startSnap = { lon: shortest.start_snap.node_lon, lat: shortest.start_snap.node_lat }
-    const endSnap = { lon: shortest.end_snap.node_lon, lat: shortest.end_snap.node_lat }
+    const startSnap = {
+      lon: shortest.start_snap.snapped_lon ?? shortest.start_snap.node_lon,
+      lat: shortest.start_snap.snapped_lat ?? shortest.start_snap.node_lat,
+    }
+    const endSnap = {
+      lon: shortest.end_snap.snapped_lon ?? shortest.end_snap.node_lon,
+      lat: shortest.end_snap.snapped_lat ?? shortest.end_snap.node_lat,
+    }
     features.push(connector(shortest.start, startSnap), connector(shortest.end, endSnap))
     features.push(pointFeature(startSnap, { kind: 'snap', label: '起点吸附节点' }))
     features.push(pointFeature(endSnap, { kind: 'snap', label: '终点吸附节点' }))
   }
 
   if (mode === 'nearest' && nearest) {
-    const originSnap = { lon: nearest.origin_snap.node_lon, lat: nearest.origin_snap.node_lat }
+    const originSnap = {
+      lon: nearest.origin_snap.snapped_lon ?? nearest.origin_snap.node_lon,
+      lat: nearest.origin_snap.snapped_lat ?? nearest.origin_snap.node_lat,
+    }
     features.push(connector(nearest.origin, originSnap))
     features.push(pointFeature(originSnap, { kind: 'snap', label: '起点吸附节点' }))
     for (const candidate of nearest.candidates) {

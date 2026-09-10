@@ -9,7 +9,13 @@ class RoutePoint(BaseModel):
 
 
 class NetworkSnap(BaseModel):
-    node_id: int
+    edge_id: int | None = None
+    source: int | None = None
+    target: int | None = None
+    fraction: float | None = Field(default=None, ge=0, le=1)
+    snapped_lon: float | None = None
+    snapped_lat: float | None = None
+    node_id: int | None = None
     node_lon: float
     node_lat: float
     snap_distance_m: float
@@ -101,7 +107,11 @@ class FacilityCandidate(BaseModel):
     subcategory: FacilitySubcategory
     lon: float
     lat: float
-    node_id: int
+    node_id: int | None
+    edge_id: int | None = None
+    fraction: float | None = Field(default=None, ge=0, le=1)
+    snapped_lon: float | None = None
+    snapped_lat: float | None = None
     straight_distance_m: float
     network_distance_m: float
     travel_time_s: float

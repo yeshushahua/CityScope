@@ -15,7 +15,13 @@ export type RoutingStatus =
 export type FacilityPreset = 'hospital' | 'healthcare' | 'fire_station'
 
 export interface NetworkSnap {
-  node_id: number
+  edge_id: number | null
+  source: number | null
+  target: number | null
+  fraction: number | null
+  snapped_lon: number | null
+  snapped_lat: number | null
+  node_id: number | null
   node_lon: number
   node_lat: number
   snap_distance_m: number
@@ -93,7 +99,11 @@ export interface FacilityCandidate {
   subcategory: 'hospital' | 'clinic' | 'doctors' | 'fire_station'
   lon: number
   lat: number
-  node_id: number
+  node_id: number | null
+  edge_id: number | null
+  fraction: number | null
+  snapped_lon: number | null
+  snapped_lat: number | null
   straight_distance_m: number
   network_distance_m: number
   travel_time_s: number

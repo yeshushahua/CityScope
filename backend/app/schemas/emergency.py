@@ -24,7 +24,11 @@ class EmergencyFacilityCandidate(BaseModel):
     subcategory: Literal["hospital", "fire_station"]
     lon: float
     lat: float
-    node_id: int
+    node_id: int | None
+    edge_id: int | None = None
+    fraction: float | None = Field(default=None, ge=0, le=1)
+    snapped_lon: float | None = None
+    snapped_lat: float | None = None
     facility_snap_distance_m: float
     straight_distance_m: float
     response_time_s: float

@@ -8,7 +8,7 @@
 
 ```text
 WGS84 起终点
-├─ CityScope：vertex snapping → pgr_dijkstra → 静态路线与 ETA
+├─ CityScope：edge snapping → pgr_withPoints → 静态路线与 ETA
 └─ FastAPI：高德坐标转换 → Driving API v2 → 当前 ETA / TMC
                                       ↓
                                仅作指标对照

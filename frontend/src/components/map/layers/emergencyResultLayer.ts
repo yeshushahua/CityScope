@@ -48,7 +48,10 @@ function resultData(incident: QueryCenter | null, result: EmergencyResponse | nu
     },
     geometry: result.response_route.geometry,
   })
-  const incidentSnap = { lon: result.incident_snap.node_lon, lat: result.incident_snap.node_lat }
+  const incidentSnap = {
+    lon: result.incident_snap.snapped_lon ?? result.incident_snap.node_lon,
+    lat: result.incident_snap.snapped_lat ?? result.incident_snap.node_lat,
+  }
   features.push(connector(result.incident, incidentSnap))
   features.push(point(incidentSnap, { kind: 'incident-snap', label: '事件吸附节点' }))
 

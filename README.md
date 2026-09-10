@@ -69,10 +69,10 @@ flowchart TB
 
 ### 路径规划
 
-地图点先吸附到道路顶点，再以静态通行时间为成本调用 `pgr_dijkstra`，并设置 `directed => true` 保留机动车单行约束。机动车有效速度按 highway 类型设定；可解析的 OSM `maxspeed` 作为上限约束参与 `min(maxspeed, highway effective speed)`，不会直接作为连续行驶速度。
+地图点投影到最近的可行驶 edge，再以静态通行时间为成本调用 pgRouting `withPoints` 系列函数，并设置 `directed => true` 保留机动车单行约束。首尾 edge 按投影位置裁剪，双向道路只使用数据库中真实存在的两条 directed edge。机动车有效速度按 highway 类型设定；可解析的 OSM `maxspeed` 作为上限约束参与 `min(maxspeed, highway effective speed)`，不会直接作为连续行驶速度。
 
 ```text
-vertex snapping → pgr_dijkstra → directed=true → static travel-time cost
+edge snapping → pgr_withPoints → directed=true → static travel-time cost
 ```
 
 ### Current navigation comparison
@@ -205,7 +205,9 @@ screenshots/ 可选的项目展示素材目录
 
 - 机动车时间基于道路等级的静态速度，不含实时交通。
 - 步行时间采用 4.8 km/h 静态速度。
-- 路径端点使用 vertex snapping，尚未使用 edge-position map matching。
+- 路径端点使用 edge snapping；平行道路、航向与高架层级不做高级地图匹配。
 - Isochrone 是基于可达节点生成的空间近似边界。
 - 建筑高度主要受 OSM `height` 与 `building:levels` 标签完整度限制。
 - CityScope 是空间决策演示项目，不是真实应急调度系统。
+
+Edge Snapping 的方向处理和已知边界见 [docs/edge-snapping.md](docs/edge-snapping.md)。
