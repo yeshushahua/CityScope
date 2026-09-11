@@ -5,6 +5,7 @@
 **城市空间智能分析与应急响应平台**
 
 CityScope 是一个基于真实 OpenStreetMap 数据构建的 WebGIS 城市空间分析与路网决策系统。它以兰州连续主城区及周边建成区为示范区，通过 PostGIS、pgRouting、FastAPI、React 和 MapLibre GL JS 提供有向路径规划、网络设施选择、可达圈、应急响应和步行生活圈分析。
+该项目使用GPT5.6-Sol辅助开发，总计约使用150-250万token
 
 **Current Status: Core project completed**
 
